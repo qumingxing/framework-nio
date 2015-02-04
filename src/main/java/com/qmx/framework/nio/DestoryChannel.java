@@ -123,10 +123,13 @@ public class DestoryChannel
 		if (null != config && null != config.getPointModel()
 				&& config.getPointModel() == PointModel.CLIENT)
 		{
-			connected = false;
 			synchronized (waitForReconnect)
 			{
-				waitForReconnect.notifyAll();
+				if (connected)
+				{
+					connected = false;
+					waitForReconnect.notifyAll();
+				}
 			}
 		}
 	}
