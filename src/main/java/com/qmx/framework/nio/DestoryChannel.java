@@ -52,6 +52,8 @@ public class DestoryChannel
 	 * <code>notify()</code>该对象恢复重连工作。
 	 */
 	private static final Object waitForReconnect = new Object();
+	private final static Logger log = LoggerFactory
+			.getLogger(DestoryChannel.class);
 	static
 	{
 		reconnect();
@@ -118,6 +120,10 @@ public class DestoryChannel
 			} catch (IOException e)
 			{
 				// TODO Auto-generated catch block
+				StringPrintWriter stringWriter = new StringPrintWriter();
+				e.printStackTrace(stringWriter);
+				log.error("异常->{}\n{}", channelBuffer.getChannelName(),
+						stringWriter.getString());
 			}
 		}
 		if (null != config && null != config.getPointModel()
