@@ -129,7 +129,10 @@ public class SelectProcess
 				{
 					try
 					{
-						socketChannel.finishConnect();
+						while (!socketChannel.finishConnect())
+						{
+							Thread.sleep(500);
+						}
 						Channel channel = new ChannelImpl();
 						channel.setChannel(socketChannel);
 						Channels.addChannel(socketChannel.socket()
@@ -142,6 +145,10 @@ public class SelectProcess
 					{
 						// TODO Auto-generated catch block
 						DestoryChannel.destory(socketChannel, e);
+					} catch (InterruptedException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			} else if (key.isReadable())
