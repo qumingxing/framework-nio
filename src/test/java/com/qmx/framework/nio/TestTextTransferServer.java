@@ -32,6 +32,18 @@ public class TestTextTransferServer
 		}
 		System.out.println("-------------");
 		Channels channels = Channels.newChannel(null);
-		channels.broadcast("heheheheheheh");
+		while(true)
+		{
+			channels.broadcast("heheheheheheh");
+			try
+			{
+				Thread.sleep(5000);
+			} catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 	}
 }
