@@ -182,6 +182,8 @@ public class SelectProcess
 
 	private void connect(SocketChannel socketChannel)
 	{
+		// 设置连接状态为已连接
+		DestoryChannel.CURRENT_CONNECT_STATE = DestoryChannel.CONNECTED;
 		ChannelBuffer channelBuffer = getChannelBufer(socketChannel);
 		MethodWorker methodWorker = newMethodWorker(channelBuffer,
 				HandleEnum.connect);

@@ -45,9 +45,21 @@ public class DestoryChannel
 	private static final Logger logger = LoggerFactory
 			.getLogger(DestoryChannel.class);
 	/**
-	 * 当前连接状态标识
+	 * 未连接
 	 */
-	private static volatile boolean connected = true;
+	protected static final int UNCONNECT = 0x00;
+	/**
+	 * 连接中
+	 */
+	protected static final int CONNECTING = 0x01;
+	/**
+	 * 已连接
+	 */
+	protected static final int CONNECTED = 0x02;
+	/**
+	 * 当前连接状态
+	 */
+	protected static volatile int CURRENT_CONNECT_STATE = CONNECTED;
 	/**
 	 * 客户端正常连接的时候该对象会调用{@link Object}的<code>wait()</code>阻塞等待,连接断开后会
 	 * <code>notify()</code>该对象恢复重连工作。
@@ -131,11 +143,11 @@ public class DestoryChannel
 		// false 不会进行重连
 		if (clientModelCheck())
 		{
+			CURRENT_CONNECT_STATE = UNCONNECT;
 			synchronized (waitForReconnect)
 			{
-				if (connected)
+				if (CURRENT_CONNECT_STATE == UNCONNECT)
 				{
-					connected = false;
 					waitForReconnect.notifyAll();
 				}
 			}
@@ -158,7 +170,8 @@ public class DestoryChannel
 				{
 					synchronized (waitForReconnect)
 					{
-						if (connected)
+						if (CURRENT_CONNECT_STATE == CONNECTED
+								|| CURRENT_CONNECT_STATE == CONNECTING)
 							try
 							{
 								waitForReconnect.wait();
@@ -167,7 +180,8 @@ public class DestoryChannel
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
-						connected = true;
+						// 连接中
+						CURRENT_CONNECT_STATE = CONNECTING;
 						AbstractConnection connection = config.getConnection();
 						try
 						{
