@@ -139,6 +139,18 @@ public class Channels extends MessageAdapter
 	}
 
 	/**
+	 * 静态方法移除一个客户端，或服务端，当客户端或服务端断开后双方都会移除各自维护的通道对象。如果认证不通过的对象也会移除。
+	 * 
+	 * @param remoteSocketAddress
+	 *            通道对象的
+	 *            <code>socketChannel.socket().getRemoteSocketAddress()<code>
+	 */
+	public static void removeChannel(String remoteSocketAddress)
+	{
+		channels.remove(remoteSocketAddress);
+	}
+
+	/**
 	 * 设置对应通道的认证结果，如果认证成功后需要调用此方法设置该通道的认证状态。否则当发送消息的时候，如果通道没有认证通过，会断开该通道的连接。
 	 * 
 	 * @param socketChannel

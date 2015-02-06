@@ -16,6 +16,7 @@ package com.qmx.framework.nio;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +84,9 @@ public class DestoryChannel
 	}
 
 	/**
-	 * 卸载资源
+	 * 卸载资源。 <code>flag</code>可能返回<code>false</code>导致{@link ChannelBuffer}不能释放，
+	 * 而客户端连接服务端只有一个导致下次重连成功后<code>getBuffer</code>时使用老的{@link ChannelBuffer}
+	 * ，而老的{@link ChannelBuffer}中的选择器已经关闭，导致注册事件报错。
 	 * 
 	 * @param channel
 	 *            通道
@@ -99,19 +102,7 @@ public class DestoryChannel
 					.getBuferChannelFactory().removeBuffer(channel);
 			if (null != channelBuffer)
 			{
-				if (null != ex)
-				{
-					MethodWorker exMethodWorker = new MethodWorker();
-					exMethodWorker.setChannelBuffer(channelBuffer);
-					exMethodWorker.setMethodName(HandleEnum.exception);
-					exMethodWorker.setException(ex);
-					workTaskThreadPool.multiExecute(exMethodWorker);
-				}
-				MethodWorker closeMethodWorker = new MethodWorker();
-				closeMethodWorker.setChannelBuffer(channelBuffer);
-				closeMethodWorker.setMethodName(HandleEnum.close);
-				workTaskThreadPool.multiExecute(closeMethodWorker);
-
+				notifyLisener(channelBuffer, ex);
 			}
 			Channels.removeChannel(channel);
 			try
@@ -125,9 +116,20 @@ public class DestoryChannel
 				log.error("异常->{}\n{}", channelBuffer.getChannelName(),
 						stringWriter.getString());
 			}
+		} else if (clientModelCheck())
+		{
+
+			List<ChannelBuffer> buffers = BufferChannelFactory
+					.getBuferChannelFactory().removeAllBuffer();
+			if (buffers.size() > 0)
+			{
+				ChannelBuffer channelBuffer = buffers.get(0);
+				Channels.removeChannel(channelBuffer.getChannelName());
+				notifyLisener(channelBuffer, ex);
+			}
 		}
-		if (null != config && null != config.getPointModel()
-				&& config.getPointModel() == PointModel.CLIENT)
+		// false 不会进行重连
+		if (clientModelCheck())
 		{
 			synchronized (waitForReconnect)
 			{
@@ -196,5 +198,44 @@ public class DestoryChannel
 
 			}
 		}.start();
+	}
+
+	/**
+	 * 是否是有效的客户端重连模式
+	 * 
+	 * @return true 有效
+	 */
+	private static boolean clientModelCheck()
+	{
+		if (null != config && null != config.getPointModel()
+				&& config.getPointModel() == PointModel.CLIENT)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 释放资源后通知监听的方法
+	 * 
+	 * @param channelBuffer
+	 *            {@link ChannelBuffer}
+	 * @param ex
+	 *            可能存在的异常对象
+	 */
+	private static void notifyLisener(ChannelBuffer channelBuffer, Exception ex)
+	{
+		if (null != ex)
+		{
+			MethodWorker exMethodWorker = new MethodWorker();
+			exMethodWorker.setChannelBuffer(channelBuffer);
+			exMethodWorker.setMethodName(HandleEnum.exception);
+			exMethodWorker.setException(ex);
+			workTaskThreadPool.multiExecute(exMethodWorker);
+		}
+		MethodWorker closeMethodWorker = new MethodWorker();
+		closeMethodWorker.setChannelBuffer(channelBuffer);
+		closeMethodWorker.setMethodName(HandleEnum.close);
+		workTaskThreadPool.multiExecute(closeMethodWorker);
 	}
 }

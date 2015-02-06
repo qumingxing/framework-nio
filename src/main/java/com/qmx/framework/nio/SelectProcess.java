@@ -137,7 +137,6 @@ public class SelectProcess
 						channel.setChannel(socketChannel);
 						Channels.addChannel(socketChannel.socket()
 								.getRemoteSocketAddress().toString(), channel);
-						socketChannel.configureBlocking(false);
 						connect(socketChannel);
 						// socketChannel.register(selector,
 						// SelectionKey.OP_WRITE);

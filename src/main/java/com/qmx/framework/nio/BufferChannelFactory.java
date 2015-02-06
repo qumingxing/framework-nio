@@ -16,11 +16,13 @@ package com.qmx.framework.nio;
 
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.net.ssl.SSLEngine;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ public class BufferChannelFactory
 	 * 维护所有{@link ChannelBuffer} 通道的<code>Map</code>集合 该集合的键由
 	 * <code>socketChannel.socket().getRemoteSocketAddress()<code>连接端远程地址及端口号构成
 	 */
-	private Map<String, ChannelBuffer> channelBuffers = new HashMap<String, ChannelBuffer>();
+	private Map<String, ChannelBuffer> channelBuffers = new ConcurrentHashMap<String, ChannelBuffer>();
 	/**
 	 * 单例的通道创建工厂
 	 */
@@ -91,10 +93,36 @@ public class BufferChannelFactory
 		if (null != channelBuffer)
 		{
 			channelBuffer.clearBytes();
-			logger.info("删除channelBuffer成功" + socketChannel);
+			logger.info("remove channelBuffer success" + socketChannel);
 			return channelBuffer;
 		}
 		return null;
+	}
+
+	/**
+	 * 移除所有元素，返回所有元素的值列表。主要针对客户端使用，因为当服务端断开后{@link SocketChannel}客户端是无法取到
+	 * <code>getRemoteSocketAddress</code> 值，导致removeBuffer方法
+	 * {@link ChannelBuffer}无法删除，使用已被关闭的 {@link Selector}
+	 * 对象报错。当客户端或服务端断开后会删除该缓冲区实现释放资源
+	 * 
+	 * 
+	 * @return 返回一个空的或所有移出成功的缓冲区对象
+	 */
+	public List<ChannelBuffer> removeAllBuffer()
+	{
+		Iterator<Entry<String, ChannelBuffer>> allBuffers = channelBuffers
+				.entrySet().iterator();
+		List<ChannelBuffer> channelBuffersList = new ArrayList<ChannelBuffer>();
+		while (allBuffers.hasNext())
+		{
+			Entry<String, ChannelBuffer> singleBuffer = allBuffers.next();
+			ChannelBuffer channelBuffer = singleBuffer.getValue();
+			channelBuffer.clearBytes();
+			logger.info("remove channelBuffer success" + singleBuffer.getKey());
+			channelBuffersList.add(channelBuffer);
+			allBuffers.remove();
+		}
+		return channelBuffersList;
 	}
 
 	/**
