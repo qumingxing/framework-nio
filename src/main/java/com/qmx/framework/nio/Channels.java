@@ -280,6 +280,64 @@ public class Channels extends MessageAdapter
 	}
 
 	/**
+	 * 发送同步消息阻塞等待对方返回
+	 * 
+	 * @param client
+	 *            发送目的地
+	 * @param message
+	 *            消息内容
+	 * @return 同步返回的消息内容
+	 */
+	public Object sendSynchronizedMessage(String client, Object message)
+	{
+		return sendSync(client, message, 0);
+	}
+
+	/**
+	 * 发送同步消息阻塞等待对方返回
+	 * 
+	 * @param client
+	 *            发送目的地
+	 * @param message
+	 *            消息内容
+	 * @param timeout
+	 *            超时时间
+	 * @return 同步返回的消息内容
+	 */
+	public Object sendSynchronizedMessage(String client, Object message,
+			long timeout)
+	{
+		return sendSync(client, message, timeout);
+	}
+
+	private Object sendSync(String client, Object message, long timeout)
+	{
+		Channel channel = channels.get(client);
+		if (null != channel)
+		{
+			if (auth(channel))
+			{
+				if (super.getMessageFormat() instanceof EnhanceMessageFormat)
+				{
+					EnhanceMessageFormat enhanceMessageFormat = (EnhanceMessageFormat) super
+							.getMessageFormat();
+					if (enhanceMessageFormat.getTransferType() == TransferType.SYNCHRONIZED)
+					{
+						super.setChannel(channel);
+						if (timeout > 0)
+							return super.writeSynchronized(message, timeout);
+						else
+							return super.writeSynchronized(message);
+					} else
+						throw new IllegalStateException(
+								"Only use SYNCHRONIZED model.");
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * 判断是否需要认证，如果需要认证检查认证结果是否正确
 	 * 
 	 * @param channel
@@ -296,5 +354,19 @@ public class Channels extends MessageAdapter
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * 获取按字典排序的首个通道名称
+	 * 
+	 * @return 通道名称
+	 */
+	public String getFirstOrderChannelName()
+	{
+		if (channels.size() > 0)
+		{
+			return new ArrayList<String>(channels.keySet()).get(0);
+		}
+		return null;
 	}
 }

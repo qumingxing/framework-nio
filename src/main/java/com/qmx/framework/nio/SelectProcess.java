@@ -55,6 +55,11 @@ public class SelectProcess
 	private static final WriteThreadPool WRITE_POOL = WriteThreadPool
 			.getInstance();
 	/**
+	 * 同步消息处理线程池
+	 */
+	private static final SynchronizedThreadPool SYNCHRONIZED_THREAD_POOL = SynchronizedThreadPool
+			.getInstance();
+	/**
 	 * 主选择器
 	 */
 	private Selector selector;
@@ -83,6 +88,19 @@ public class SelectProcess
 		DestoryChannel.setWorkTaskThreadPool(workTaskThreadPool);
 	}
 
+	public SelectProcess(int writePoolSize, int readPoolSize, int synchPoolSize)
+	{
+		WRITE_POOL.setPoolSize(writePoolSize);
+		WRITE_POOL.createThreadPool();
+		MessageAdapter.setThreadPool(WRITE_POOL);
+		// recieveMessage = new RecieveMessage(writePoolSize);
+		workTaskThreadPool.setPoolSize(readPoolSize);
+		workTaskThreadPool.createThreadPool();
+		SYNCHRONIZED_THREAD_POOL.setPoolSize(synchPoolSize);
+		SYNCHRONIZED_THREAD_POOL.createThreadPool();
+		DestoryChannel.setWorkTaskThreadPool(workTaskThreadPool);
+	}
+
 	protected void select(Set<SelectionKey> keys)
 	{
 		Iterator<SelectionKey> iter = keys.iterator();
@@ -105,7 +123,7 @@ public class SelectProcess
 					// ByteChannel byteChannel = socketChannel;byteChannel.r
 					socketChannel.socket().setSendBufferSize(8096);
 					socketChannel.socket().setReceiveBufferSize(8096);
-					//socketChannel.socket().setKeepAlive(true);长时间处理空闲是否要关闭,默认false
+					// socketChannel.socket().setKeepAlive(true);长时间处理空闲是否要关闭,默认false
 					// socketChannel.socket().setTcpNoDelay(true);
 					socketChannel.configureBlocking(false);
 					Channel channel = new ChannelImpl();

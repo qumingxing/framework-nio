@@ -46,6 +46,14 @@ public class MethodWorker implements Worker
 	 * 存储数据类型，根据数据的类型来决定使用何种{@link EncoderAndDecoder}来进行解码
 	 */
 	private DataType dataType;
+	/**
+	 * 同步请求的消息编号
+	 */
+	private String messageNumber;
+	/**
+	 * 消息的传递类型
+	 */
+	private TransferType transferType;
 
 	public ChannelBuffer getChannelBuffer()
 	{
@@ -103,6 +111,8 @@ public class MethodWorker implements Worker
 		event.setMessageFormat(channelBuffer.getMessageContext()
 				.getMessageFormat());
 		event.setDataType(dataType);
+		event.setTransferType(transferType);
+		event.setMessageNumber(messageNumber);
 		if (null != byt)
 		{
 			event.setEncodeByt(byt);
@@ -119,6 +129,48 @@ public class MethodWorker implements Worker
 	public void setDataType(DataType dataType)
 	{
 		this.dataType = dataType;
+	}
+
+	/**
+	 * 获取同步传送消息的消息编号
+	 * 
+	 * @return 消息编号
+	 */
+	public String getMessageNumber()
+	{
+		return messageNumber;
+	}
+
+	/**
+	 * 设置同步传送消息的消息编号
+	 * 
+	 * @param messageNumber
+	 *            消息编号
+	 */
+	public void setMessageNumber(String messageNumber)
+	{
+		this.messageNumber = messageNumber;
+	}
+
+	/**
+	 * 获取消息的传送类型
+	 * 
+	 * @return {@link TransferType}
+	 */
+	public TransferType getTransferType()
+	{
+		return transferType;
+	}
+
+	/**
+	 * 设置消息的传送类型
+	 * 
+	 * @param transferType
+	 *            {@link TransferType}
+	 */
+	public void setTransferType(TransferType transferType)
+	{
+		this.transferType = transferType;
 	}
 
 }

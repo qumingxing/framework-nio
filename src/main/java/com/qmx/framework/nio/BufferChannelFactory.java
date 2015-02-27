@@ -168,6 +168,9 @@ public class BufferChannelFactory
 			} else if (bufferType == HybridLengthSplitChannelBuffer.class)
 			{
 				newBuffer = new HybridLengthSplitChannelBuffer();
+			} else if (bufferType == ComplexSplitChannelBuffer.class)
+			{
+				newBuffer = new ComplexSplitChannelBuffer();
 			} else
 			{
 				newBuffer = new DefaultChannelBuffer();

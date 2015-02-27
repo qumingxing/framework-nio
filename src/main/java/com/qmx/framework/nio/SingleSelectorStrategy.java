@@ -35,9 +35,32 @@ public class SingleSelectorStrategy extends SelectProcess implements
 	private ExecutorService executorService = Executors
 			.newSingleThreadExecutor();
 
+	/**
+	 * 
+	 * @param writePoolSize
+	 *            写线程池
+	 * @param readPoolSize
+	 *            读线程池
+	 */
 	public SingleSelectorStrategy(int writePoolSize, int readPoolSize)
 	{
 		super(writePoolSize, readPoolSize);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * 
+	 * @param writePoolSize
+	 *            写线程池
+	 * @param readPoolSize
+	 *            读线程池
+	 * @param synchPoolSize
+	 *            同步消息处理线程池
+	 */
+	public SingleSelectorStrategy(int writePoolSize, int readPoolSize,
+			int synchPoolSize)
+	{
+		super(writePoolSize, readPoolSize, synchPoolSize);
 		// TODO Auto-generated constructor stub
 	}
 

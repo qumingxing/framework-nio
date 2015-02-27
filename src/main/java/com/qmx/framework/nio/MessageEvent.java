@@ -32,6 +32,14 @@ public class MessageEvent extends MessageAdapter
 	 * 数据类型:字符串、二进制
 	 */
 	private DataType dataType;
+	/**
+	 * 消息传递方式{@link TransferType}
+	 */
+	private TransferType transferType;
+	/**
+	 * 同步传递消息编号
+	 */
+	private String messageNumber;
 
 	public String getMessageType()
 	{
@@ -69,6 +77,36 @@ public class MessageEvent extends MessageAdapter
 	public void setDataType(DataType dataType)
 	{
 		this.dataType = dataType;
+	}
+
+	/**
+	 * 获取消息传递类型{@link TransferType}
+	 * 
+	 * @return {@link TransferType}
+	 */
+	public TransferType getTransferType()
+	{
+		return transferType;
+	}
+
+	public void setTransferType(TransferType transferType)
+	{
+		this.transferType = transferType;
+	}
+
+	/**
+	 * 获取同步传递消息编号
+	 * 
+	 * @return 同步消息编号
+	 */
+	public String getMessageNumber()
+	{
+		return messageNumber;
+	}
+
+	public void setMessageNumber(String messageNumber)
+	{
+		this.messageNumber = messageNumber;
 	}
 
 }

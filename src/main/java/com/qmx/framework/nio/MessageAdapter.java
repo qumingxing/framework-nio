@@ -38,6 +38,12 @@ public class MessageAdapter extends AbstractMessage
 	 */
 	private static ThreadPool threadPool;
 
+	/**
+	 * 发送异步消息
+	 * 
+	 * @param message
+	 *            消息内容
+	 */
 	protected void write(Object message)
 	{
 		byte[] sendMsg = null;
@@ -67,6 +73,38 @@ public class MessageAdapter extends AbstractMessage
 							channel.getChannel());
 			singleWriteThread.multiExecute(writeWorker);
 		}
+	}
+
+	/**
+	 * 发送异步消息并同步等待返回的结果，默认3秒超时
+	 * 
+	 * @param message
+	 *            发送的消息内容
+	 * @return 响应的消息内容
+	 */
+	protected Object writeSynchronized(Object message)
+	{
+		this.write(message);
+		return SynchronizedThreadPool.getInstance().getResult(
+				MessageNumber.getStoreMessageNumber());
+	}
+
+	/**
+	 * 自定义全局超时时间，发送异步消息并同步等待返回的结果
+	 * 
+	 * @param message
+	 *            发送的消息内容
+	 * @param timeout
+	 *            超时时间(毫秒)
+	 * @return 响应的消息内容
+	 */
+	protected Object writeSynchronized(Object message, long timeout)
+	{
+		this.write(message);
+		SynchronizedThreadPool.getInstance().setDefaultSynchronizedTimeout(
+				timeout);
+		return SynchronizedThreadPool.getInstance().getResult(
+				MessageNumber.getStoreMessageNumber());
 	}
 
 	public Channel getChannel()
