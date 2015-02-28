@@ -211,11 +211,10 @@ public class SelectProcess
 		// TODO Auto-generated method stub
 		int temp = 0;
 		int sumByte = 0;
+		ByteBuffer byteBuffer = null;
 		try
 		{
-			// 5$abcde2$aa
-			ByteBuffer byteBuffer = buffersPool
-					.getByteBuffer(defaultBufferCapacity);
+			byteBuffer = buffersPool.getByteBuffer(defaultBufferCapacity);
 			while ((temp = channel.read(byteBuffer)) > 0)
 			{
 				sumByte += temp;
@@ -230,7 +229,6 @@ public class SelectProcess
 				byteBuffer.get(byt);
 				ChannelBuffer channelBuffer = getChannelBufer(channel);
 				channelBuffer.setBytes(byt);
-				buffersPool.realse(byteBuffer);
 			}
 			if (temp == -1)
 			{
@@ -254,6 +252,9 @@ public class SelectProcess
 			 * workTaskThreadPool.multiExecute(methodWorker);
 			 */
 			DestoryChannel.destory(channel, e);
+		} finally
+		{
+			buffersPool.realse(byteBuffer);
 		}
 	}
 

@@ -237,7 +237,15 @@ public class Channels extends MessageAdapter
 	 */
 	public void broadcast(Object message)
 	{
-
+		if (super.getMessageFormat() instanceof EnhanceMessageFormat)
+		{
+			EnhanceMessageFormat enhanceMessageFormat = (EnhanceMessageFormat) super
+					.getMessageFormat();
+			if (enhanceMessageFormat.getTransferType() == TransferType.SYNCHRONIZED)
+			{
+				throw new IllegalStateException("Only use ASYNCHRONY model.");
+			}
+		}
 		Iterator<Entry<String, Channel>> ite = channels.entrySet().iterator();
 		while (ite.hasNext())
 		{
@@ -265,6 +273,15 @@ public class Channels extends MessageAdapter
 	 */
 	public void broadcastSingle(String client, Object message)
 	{
+		if (super.getMessageFormat() instanceof EnhanceMessageFormat)
+		{
+			EnhanceMessageFormat enhanceMessageFormat = (EnhanceMessageFormat) super
+					.getMessageFormat();
+			if (enhanceMessageFormat.getTransferType() == TransferType.SYNCHRONIZED)
+			{
+				throw new IllegalStateException("Only use ASYNCHRONY model.");
+			}
+		}
 		Channel channel = channels.get(client);
 		if (null != channel)
 		{

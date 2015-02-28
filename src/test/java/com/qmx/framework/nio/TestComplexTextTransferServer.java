@@ -51,12 +51,10 @@ public class TestComplexTextTransferServer
 			channels.broadcast("china"+i);
 			
 		}
-		/*while(true)
+		while(true)
 		{
-			channels.setMessageFormat(enhanceStringToStringSYNCHRONIZED);
-			channels.broadcast("hehehehehehehSYNCHRONIZED");
 			channels.setMessageFormat(enhanceStringToStringASYNCHRONY);
-			channels.broadcast("hehehehehehehASYNCHRONY");
+			channels.broadcast("hehehehehehe");
 			try
 			{
 				Thread.sleep(5000);
@@ -65,7 +63,7 @@ public class TestComplexTextTransferServer
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}*/
+		}
 		
 	}
 }
