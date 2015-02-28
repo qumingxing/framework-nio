@@ -173,4 +173,14 @@ public class WorkTaskThreadPool implements ThreadPool
 			handleListener.exception(event, e);
 		}
 	}
+
+	@Override
+	public void shutdownThreadPool()
+	{
+		// TODO Auto-generated method stub
+		if (null != executorService && !executorService.isShutdown())
+		{
+			executorService.shutdown();
+		}
+	}
 }

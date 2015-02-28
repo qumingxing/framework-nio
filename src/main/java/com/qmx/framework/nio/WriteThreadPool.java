@@ -117,4 +117,14 @@ public class WriteThreadPool implements ThreadPool
 
 	}
 
+	@Override
+	public void shutdownThreadPool()
+	{
+		// TODO Auto-generated method stub
+		if (null != executorService && !executorService.isShutdown())
+		{
+			executorService.shutdown();
+		}
+	}
+
 }

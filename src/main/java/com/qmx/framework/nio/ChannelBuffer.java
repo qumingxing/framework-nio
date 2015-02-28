@@ -35,7 +35,7 @@ public interface ChannelBuffer
 	public void setBytes(byte[] bytes);
 
 	/**
-	 * 清空缓冲区中的所有数据
+	 * 清空缓冲区中的所有数据，释放重量级资源
 	 */
 	public void clearBytes();
 

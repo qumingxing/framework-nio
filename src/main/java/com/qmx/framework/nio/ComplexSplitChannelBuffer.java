@@ -70,7 +70,7 @@ public class ComplexSplitChannelBuffer extends AbstractChannelBuffer
 	/**
 	 * 完整的读取一段数据后会创建该对象
 	 */
-	//private MethodWorker methodWorker;
+	// private MethodWorker methodWorker;
 	private final static int SYNCHRONIZED = 83;// S
 	private final static int ASYNCHRONY = 65;// A
 	private final static int STRING = 83;// S
@@ -340,5 +340,6 @@ public class ComplexSplitChannelBuffer extends AbstractChannelBuffer
 	{
 		// TODO Auto-generated method stub
 		arraysData = null;
+		SynchronizedThreadPool.getInstance().clearAllSyncResponsePool();
 	}
 }

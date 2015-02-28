@@ -48,6 +48,9 @@ public class SynchronizedThreadPool implements ThreadPool
 	 * 线程池大小
 	 */
 	private int size;
+	/**
+	 * 存储同步响应数据
+	 */
 	private volatile Map<String, Object> responsePool = new HashMap<String, Object>();
 	/**
 	 * 默认的同步请求超时时间
@@ -60,6 +63,14 @@ public class SynchronizedThreadPool implements ThreadPool
 	private final static Logger log = LoggerFactory
 			.getLogger(SynchronizedThreadPool.class);
 
+	/**
+	 * 设置同步响应数据
+	 * 
+	 * @param messageNumber
+	 *            消息编号
+	 * @param message
+	 *            响应内容
+	 */
 	protected void setResponse(String messageNumber, Object message)
 	{
 		responsePool.put(messageNumber, message);
@@ -179,5 +190,23 @@ public class SynchronizedThreadPool implements ThreadPool
 	{
 		this.defaultSynchronizedTimeout = timeout;
 		this.waitThreadStop = this.defaultSynchronizedTimeout / 10;
+	}
+
+	/**
+	 * 清空存储同步响应数据
+	 */
+	public void clearAllSyncResponsePool()
+	{
+		responsePool.clear();
+	}
+
+	@Override
+	public void shutdownThreadPool()
+	{
+		// TODO Auto-generated method stub
+		if (null != executorService && !executorService.isShutdown())
+		{
+			executorService.shutdown();
+		}
 	}
 }

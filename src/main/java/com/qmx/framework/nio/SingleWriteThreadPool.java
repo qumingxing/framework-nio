@@ -91,4 +91,10 @@ public class SingleWriteThreadPool implements ThreadPool
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void shutdownThreadPool()
+	{
+		// TODO Auto-generated method stub
+	}
 }

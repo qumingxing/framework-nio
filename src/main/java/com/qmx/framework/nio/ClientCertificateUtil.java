@@ -54,7 +54,7 @@ public class ClientCertificateUtil
 	}
 
 	/**
-	 * 返回一条经过组装的认证消息内容
+	 * 返回一条经过组装的认证消息内容RSA加密字符串长度不能大于117否则会报错
 	 * 
 	 * @param userName
 	 *            用户名

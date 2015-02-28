@@ -22,13 +22,45 @@ package com.qmx.framework.nio;
  */
 public interface ThreadPool
 {
+	/**
+	 * 设置线程池大小
+	 * 
+	 * @param size
+	 *            线程池大小
+	 */
 	public void setPoolSize(int size);
 
+	/**
+	 * 获取线程池大小
+	 * 
+	 * @return 线程池大小
+	 */
 	public int getPoolSize();
 
+	/**
+	 * 创建线程池
+	 */
 	public void createThreadPool();
 
+	/**
+	 * 多线程池任务执行
+	 * 
+	 * @param worker
+	 *            任务对象
+	 */
 	public void multiExecute(Worker worker);
 
+	/**
+	 * 单线程任务执行
+	 * 
+	 * @param worker
+	 *            任务对象
+	 */
 	public void singleExecute(Worker worker);
+
+	/**
+	 * 关闭线程池，该线程池是多通道共用的且可以重复使用不会多次创建，不能释放。
+	 */
+	@Deprecated
+	public void shutdownThreadPool();
 }
