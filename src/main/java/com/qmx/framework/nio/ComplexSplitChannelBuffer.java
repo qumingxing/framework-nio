@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 混合数据类型(String,byte)的{@link ChannelBuffer}
+ * 支持同步和异步以及混合数据类型(String,byte)的{@link ChannelBuffer}
  * 缓冲区实现，也就是客户端可以发送二进制也可以发字符串。TCP会存在拆包和粘包的情况，所以需要对数据的完整性做特殊处理。
  * 
  * <pre>

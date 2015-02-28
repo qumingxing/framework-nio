@@ -119,4 +119,11 @@ public class SingleSelectorStrategy extends SelectProcess implements
 		// TODO Auto-generated method stub
 		super.setMessageContext(context);
 	}
+
+	@Override
+	public void setReadBufferCapacity(int capacity)
+	{
+		// TODO Auto-generated method stub
+		super.setDefaultBufferCapacity(capacity);
+	}
 }

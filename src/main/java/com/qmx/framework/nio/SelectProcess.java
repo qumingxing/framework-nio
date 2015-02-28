@@ -76,6 +76,10 @@ public class SelectProcess
 	 */
 	private BufferChannelFactory bufferChannelFactory = BufferChannelFactory
 			.getBuferChannelFactory();
+	/**
+	 * 默认的接收数据缓冲大小
+	 */
+	private int defaultBufferCapacity = 2048;
 
 	public SelectProcess(int writePoolSize, int readPoolSize)
 	{
@@ -147,10 +151,7 @@ public class SelectProcess
 				{
 					try
 					{
-						while (!socketChannel.finishConnect())
-						{
-							Thread.sleep(500);
-						}
+						socketChannel.finishConnect();
 						Channel channel = new ChannelImpl();
 						channel.setChannel(socketChannel);
 						Channels.addChannel(socketChannel.socket()
@@ -162,10 +163,6 @@ public class SelectProcess
 					{
 						// TODO Auto-generated catch block
 						DestoryChannel.destory(socketChannel, e);
-					} catch (InterruptedException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 				}
 			} else if (key.isReadable())
@@ -217,7 +214,8 @@ public class SelectProcess
 		try
 		{
 			// 5$abcde2$aa
-			ByteBuffer byteBuffer = buffersPool.getByteBuffer(16000);
+			ByteBuffer byteBuffer = buffersPool
+					.getByteBuffer(defaultBufferCapacity);
 			while ((temp = channel.read(byteBuffer)) > 0)
 			{
 				sumByte += temp;
@@ -359,4 +357,16 @@ public class SelectProcess
 		// TODO Auto-generated method stub
 		Channels.startScheduledCheck(scheduledCheckValid);
 	}
+
+	/**
+	 * 设置默认的接收数据缓冲区大小
+	 * 
+	 * @param defaultBufferCapacity
+	 *            缓冲区大小
+	 */
+	public void setDefaultBufferCapacity(int defaultBufferCapacity)
+	{
+		this.defaultBufferCapacity = defaultBufferCapacity;
+	}
+
 }

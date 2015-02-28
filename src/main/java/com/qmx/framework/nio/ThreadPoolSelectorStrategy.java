@@ -55,4 +55,11 @@ public class ThreadPoolSelectorStrategy extends SelectProcess implements
 		// TODO Auto-generated method stub
 		super.setHandleListener(handleListener);
 	}
+
+	@Override
+	public void setReadBufferCapacity(int capacity)
+	{
+		// TODO Auto-generated method stub
+		super.setDefaultBufferCapacity(capacity);
+	}
 }
