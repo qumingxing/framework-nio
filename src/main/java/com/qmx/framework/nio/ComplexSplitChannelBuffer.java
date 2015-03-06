@@ -58,11 +58,11 @@ public class ComplexSplitChannelBuffer extends AbstractChannelBuffer
 	 * 300000=300KB<br/>
 	 * 回收的算法<code>arraysDataPostion>gcArraysDataPostionSize</code>时才回收，提高回收利用率
 	 */
-	private int gcArraysDataPostionSize = 500000;
+	private int gcArraysDataPostionSize = defaultArraysLength / 100 * 80;
 	/**
 	 * 默认初始化数组大小
 	 */
-	private static int defaultArraysLength = 50000;
+	private static int defaultArraysLength = 5000;
 	/**
 	 * 分发池
 	 */
