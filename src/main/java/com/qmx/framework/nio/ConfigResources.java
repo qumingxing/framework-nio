@@ -52,6 +52,10 @@ public class ConfigResources
 	 * 用户自定义实现简单的用户名密码校验
 	 */
 	private CertificateInterface certificateInterface;
+	/**
+	 * 客户端重连间隔时间默认2000毫秒
+	 */
+	private long clientReconnectDelayTime = 2000;
 
 	/**
 	 * 获取服务端IP地址
@@ -225,6 +229,29 @@ public class ConfigResources
 			CertificateInterface certificateInterface)
 	{
 		this.certificateInterface = certificateInterface;
+	}
+
+	/**
+	 * 获取客户端重连间隔时间，可通过
+	 * <code>setClientReconnectDelayTime(long clientReconnectDelayTime)</code>
+	 * 设置。
+	 * 
+	 * @return 默认2000毫秒
+	 */
+	public long getClientReconnectDelayTime()
+	{
+		return clientReconnectDelayTime;
+	}
+
+	/**
+	 * 设置客户端重连间隔时间默认2000毫秒
+	 * 
+	 * @param clientReconnectDelayTime
+	 *            间隔时间(毫秒)
+	 */
+	public void setClientReconnectDelayTime(long clientReconnectDelayTime)
+	{
+		this.clientReconnectDelayTime = clientReconnectDelayTime;
 	}
 
 }

@@ -15,7 +15,6 @@
 package com.qmx.framework.nio;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.channels.ClosedChannelException;

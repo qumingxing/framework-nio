@@ -3,6 +3,7 @@ package com.qmx.framework.nio.listener;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,10 @@ public class JmeterTestServerDefaultHandleListener implements HandleListener
 			.getLogger(JmeterTestServerDefaultHandleListener.class);
 	private final ScheduledExecutorService scheduledExecutorService = Executors
 			.newSingleThreadScheduledExecutor();
-	private int readCount;
-	private int connectSum;
-	private int disconnectSum;
-
+	private AtomicInteger  readCount = new AtomicInteger(0);
+	private AtomicInteger connectSum = new AtomicInteger(0);
+	private AtomicInteger disconnectSum = new AtomicInteger(0);
+	private AtomicInteger errorSum = new AtomicInteger(0);
 	public JmeterTestServerDefaultHandleListener()
 	{
 		scheduledExecutorService.scheduleAtFixedRate(new Runnable()
@@ -35,8 +36,8 @@ public class JmeterTestServerDefaultHandleListener implements HandleListener
 			{
 				// TODO Auto-generated method stub
 				// event.write(message)
-				System.out.println("累计连接数" + connectSum + ",累计断开数"
-						+ disconnectSum + ",累计读取次数" + readCount);
+				System.out.println("累计连接数" + connectSum.get() + ",累计断开数"
+						+ disconnectSum.get() + ",累计读取次数" + readCount.get()+",错误次数"+errorSum.get());
 			}
 		}, 10000, 10000, TimeUnit.MILLISECONDS);
 	}
@@ -52,7 +53,7 @@ public class JmeterTestServerDefaultHandleListener implements HandleListener
 	public void close(MessageEvent event)
 	{
 		// TODO Auto-generated method stub
-		disconnectSum++;
+		disconnectSum.addAndGet(1);
 	}
 
 	@Override
@@ -60,7 +61,7 @@ public class JmeterTestServerDefaultHandleListener implements HandleListener
 	{
 		// TODO Auto-generated method stub
 		// 判断确定类型后执行
-		readCount++;
+		readCount.addAndGet(1);
 	}
 
 	@Override
@@ -79,12 +80,13 @@ public class JmeterTestServerDefaultHandleListener implements HandleListener
 		e.printStackTrace(stringWriter);
 		log.error("异常->{}\n{}", event.getChannel().getChannelName(),
 				stringWriter.getString());
+		errorSum.addAndGet(1);
 	}
 
 	@Override
 	public void accept(MessageEvent event)
 	{
 		// TODO Auto-generated method stub
-		connectSum++;
+		connectSum.addAndGet(1);
 	}
 }

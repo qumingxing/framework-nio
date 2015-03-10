@@ -199,7 +199,8 @@ public class DestoryChannel
 							logger.debug("重连开始" + reconnectCount++);
 							try
 							{
-								Thread.sleep(2000);
+								Thread.sleep(config
+										.getClientReconnectDelayTime());
 							} catch (InterruptedException e)
 							{
 								// TODO Auto-generated catch block
