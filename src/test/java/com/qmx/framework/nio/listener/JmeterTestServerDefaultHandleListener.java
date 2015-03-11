@@ -36,8 +36,8 @@ public class JmeterTestServerDefaultHandleListener implements HandleListener
 			{
 				// TODO Auto-generated method stub
 				// event.write(message)
-				System.out.println("累计连接数" + connectSum.get() + ",累计断开数"
-						+ disconnectSum.get() + ",累计读取次数" + readCount.get()+",错误次数"+errorSum.get());
+				System.out.println("sum connected:" + connectSum.get() + ",sum disconnect:"
+						+ disconnectSum.get() + ",sum read:" + readCount.get()+",sum error:"+errorSum.get());
 			}
 		}, 10000, 10000, TimeUnit.MILLISECONDS);
 	}

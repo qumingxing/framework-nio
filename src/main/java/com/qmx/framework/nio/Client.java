@@ -116,6 +116,19 @@ public class Client extends AbstractConnection
 	public void serverSocketChannelOpen() throws IOException
 	{
 		socketChannel = SocketChannel.open();
+		// 表示是否允许重用Socket所绑定的本地地址。
+		socketChannel.socket().setReuseAddress(true);
+		// 1、不设置SO_KEEPALIVE.会导致当客户端与服务端网络断开时双方都不知道会一直保持ESTABLISHDED状态不释放
+		// 2、保持连接检测对方主机是否崩溃，避免（服务器）永远阻塞于TCP连接的输入。
+		// 3、设置该选项后，如果2小时内在此套接口的任一方向都没有数据交换，TCP就自动给对方
+		// 发一个保持存活探测分节(keepalive probe)。这是一个对方必须响应的TCP分节它会导致以下三种情况：
+		// 1)、对方接收一切正常：以期望的ACK响应，2小时后，TCP将发出另一个探测分节。
+		// 2)、对方已崩溃且已重新启动：以RST响应。套接口的待处理错误被置为ECONNRESET，套接 口本身则被关闭。
+		// 3)、对方无任何响应：源自berkeley的TCP发送另外8个探测分节，相隔75秒一个，试图得到一个响应。在发出第一个探测分节11分钟15秒后若仍无响应就放弃。套接口的待处理错误被置为ETIMEOUT，套接口本身则被关闭。如ICMP错误是“host
+		// unreachable(主机不可达)”，说明对方主机并没有崩溃，但是不可达，这种情况下待处理错误被置为
+		// EHOSTUNREACH。
+		socketChannel.socket().setKeepAlive(true);// 长时间处理空闲是否要关闭,默认false
+		socketChannel.socket().setSoLinger(true, 0);
 		socketChannel.configureBlocking(false);
 	}
 

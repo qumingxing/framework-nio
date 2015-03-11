@@ -12,7 +12,7 @@ public class JmeterTestTextTransferServer
 		config.setPort(10086);
 		config.setPointModel(PointModel.SERVER);
 		Server server = new Server(config.getPort());
-		SelectorStrategy selectorStrategy = new SingleSelectorStrategy(10, 10);
+		SelectorStrategy selectorStrategy = new SingleSelectorStrategy(50, 50);
 		selectorStrategy.setHandleListen(new JmeterTestServerDefaultHandleListener());
 		selectorStrategy.setBufferType(LengthSplitChannelBuffer.class);
 		selectorStrategy.setConfig(config);

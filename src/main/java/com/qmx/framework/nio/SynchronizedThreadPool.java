@@ -14,8 +14,9 @@
  */
 package com.qmx.framework.nio;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -49,9 +50,13 @@ public class SynchronizedThreadPool implements ThreadPool
 	 */
 	private int size;
 	/**
-	 * 存储同步响应数据
+	 * 存储同步响应数据 </br> 以弱键 实现的基于哈希表的 Map。在 WeakHashMap
+	 * 中，当某个键不再正常使用时，将自动移除其条目。更精确地说，对于一个给定的键
+	 * ，其映射的存在并不阻止垃圾回收器对该键的丢弃，这就使该键成为可终止的，被终止
+	 * ，然后被回收。丢弃某个键时，其条目从映射中有效地移除，因此，该类的行为与其他的 Map 实现有所不同。
 	 */
-	private volatile Map<String, Object> responsePool = new HashMap<String, Object>();
+	private volatile Map<String, Object> responsePool = Collections
+			.synchronizedMap(new WeakHashMap<String, Object>());
 	/**
 	 * 默认的同步请求超时时间
 	 */
