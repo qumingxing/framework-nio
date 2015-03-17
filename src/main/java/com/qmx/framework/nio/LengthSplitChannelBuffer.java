@@ -185,6 +185,19 @@ public class LengthSplitChannelBuffer extends AbstractChannelBuffer
 		for (int i = arraysDataPostion; i < arraysDataAvaliableLength; i++)
 		{
 			byte oneByte = arraysData[i];
+			if (super.isHeartEnable() && super.isServerModel())
+			{
+				int i_index_position = super.heartExecute(oneByte,
+						arraysDataAvaliableLength - arraysDataPostion,
+						super.getChannelName());
+				if (i_index_position == 3)
+				{
+					arraysDataPostion = i + i_index_position;
+					i = arraysDataPostion - 1;
+					continue;
+				} else if (i_index_position == 0)
+					break;
+			}
 			if (oneByte == 36)
 			{
 				int le = Integer.parseInt(new String(Arrays.copyOfRange(by, 0,

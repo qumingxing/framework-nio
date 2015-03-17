@@ -15,8 +15,6 @@
 package com.qmx.framework.nio;
 
 import java.nio.channels.SocketChannel;
-import java.util.Date;
-
 import javax.net.ssl.SSLEngine;
 
 /**
@@ -120,7 +118,7 @@ public interface Channel
 	 * @param date
 	 *            接受时间
 	 */
-	public void setAcceptDate(Date date);
+	public void setAcceptDate(long date);
 
 	/**
 	 * 获服务端接受时间(accept)，该时间 的作用是根据给定的最大等待认证时间定时检查客户端的有效性，服务端必须要启用认证功能，否则该方法不会生效
@@ -128,5 +126,5 @@ public interface Channel
 	 * 
 	 * @return 接受时间
 	 */
-	public Date getAcceptDate();
+	public long getAcceptDate();
 }

@@ -117,7 +117,7 @@ public class Client extends AbstractConnection
 	{
 		socketChannel = SocketChannel.open();
 		// 表示是否允许重用Socket所绑定的本地地址。
-		socketChannel.socket().setReuseAddress(true);
+		// socketChannel.socket().setReuseAddress(true);
 		// 1、不设置SO_KEEPALIVE.会导致当客户端与服务端网络断开时双方都不知道会一直保持ESTABLISHDED状态不释放
 		// 2、保持连接检测对方主机是否崩溃，避免（服务器）永远阻塞于TCP连接的输入。
 		// 3、设置该选项后，如果2小时内在此套接口的任一方向都没有数据交换，TCP就自动给对方
@@ -127,8 +127,9 @@ public class Client extends AbstractConnection
 		// 3)、对方无任何响应：源自berkeley的TCP发送另外8个探测分节，相隔75秒一个，试图得到一个响应。在发出第一个探测分节11分钟15秒后若仍无响应就放弃。套接口的待处理错误被置为ETIMEOUT，套接口本身则被关闭。如ICMP错误是“host
 		// unreachable(主机不可达)”，说明对方主机并没有崩溃，但是不可达，这种情况下待处理错误被置为
 		// EHOSTUNREACH。
-		socketChannel.socket().setKeepAlive(true);// 长时间处理空闲是否要关闭,默认false
-		socketChannel.socket().setSoLinger(true, 0);
+		//socketChannel.socket().setKeepAlive(true);// 长时间处理空闲是否要关闭,默认false
+		socketChannel.socket().setTcpNoDelay(true);
+		// socketChannel.socket().setSoLinger(true, 0);
 		socketChannel.configureBlocking(false);
 	}
 

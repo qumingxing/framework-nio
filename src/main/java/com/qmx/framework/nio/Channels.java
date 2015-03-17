@@ -45,6 +45,10 @@ public class Channels extends MessageAdapter
 	 */
 	private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors
 			.newSingleThreadScheduledExecutor();
+	/**
+	 * 服务端检查心跳状态的定时任务
+	 */
+	private static ScheduledExecutorService SCHEDULED_EXECUTOR_HEART_SERVICE;
 
 	/**
 	 * {@link Channels}发送的消息不依赖于特定的通道，而是可以向所有通道或指定的通道发送消息，它已经脱离了
@@ -189,7 +193,7 @@ public class Channels extends MessageAdapter
 				// TODO Auto-generated method stub
 				Iterator<Entry<String, Channel>> ite = channels.entrySet()
 						.iterator();
-				Date acceptDate = null;
+				long acceptDate = 0;
 				Date calculateFutureTime = null;
 				while (ite.hasNext())
 				{
@@ -204,7 +208,7 @@ public class Channels extends MessageAdapter
 					{
 						acceptDate = channel.getAcceptDate();
 						calculateFutureTime = new Date();
-						calculateFutureTime.setTime(acceptDate.getTime()
+						calculateFutureTime.setTime(acceptDate
 								+ scheduledCheckValid
 										.getMaxAcceptWaitCertificateTime());
 						if (calculateFutureTime.getTime() < System
@@ -214,7 +218,7 @@ public class Channels extends MessageAdapter
 									entry.getValue().getChannel(),
 									new CertificateAuthException(
 											"到达最大等待身份认证许可时间["
-													+ acceptDate.toString()
+													+ acceptDate
 													+ "]["
 													+ calculateFutureTime
 															.toString()
@@ -385,5 +389,85 @@ public class Channels extends MessageAdapter
 			return new ArrayList<String>(channels.keySet()).get(0);
 		}
 		return null;
+	}
+
+	/**
+	 * 获取缓存中的第一个{@link Channel}对象
+	 * 
+	 * @return {@link Channel}对象
+	 */
+	protected Channel getFirstChannel()
+	{
+		String key = getFirstOrderChannelName();
+		if (null != key)
+			return channels.get(key);
+		return null;
+	}
+
+	/**
+	 * 将通道的acceptTime 刷新为当前时间{@link AbstractHeartChannelBuffer}<br/>
+	 * 断网的时候服务端和客户端可能都无法感知到对方的状态(尤其Linux下)，导致大量资源占用没有释放，
+	 * 
+	 * @param channelName
+	 *            通道名称
+	 */
+	protected static void flushAcceptTime(String channelName)
+	{
+		channels.get(channelName).setAcceptDate(System.currentTimeMillis());
+	}
+
+	/**
+	 * 服务端检查客户端心跳的有效性
+	 * 
+	 * @see SelectProcess
+	 *      <code>public void setConfig(ConfigResources config)</code>
+	 * @param heartCheck
+	 *            {@link HeartCheck}
+	 */
+	protected static void checkHeart(final HeartCheck heartCheck)
+	{
+		if (null != heartCheck && heartCheck.isEnableHeart())
+		{
+			if (null == SCHEDULED_EXECUTOR_HEART_SERVICE)
+			{
+				SCHEDULED_EXECUTOR_HEART_SERVICE = Executors
+						.newSingleThreadScheduledExecutor();
+			}
+			// 最大允许延迟30%
+			final long lastDelay = heartCheck.getDelayTime()
+					+ heartCheck.getDelayTime() / 100 * 30;
+			SCHEDULED_EXECUTOR_HEART_SERVICE.scheduleWithFixedDelay(
+					new Runnable()
+					{
+
+						@Override
+						public void run()
+						{
+							// TODO Auto-generated method stub
+							Iterator<Entry<String, Channel>> ite = channels
+									.entrySet().iterator();
+							while (ite.hasNext())
+							{
+								Entry<String, Channel> entry = ite.next();
+								Channel channel = entry.getValue();
+								if ((channel.getAcceptDate() + lastDelay) < System
+										.currentTimeMillis()
+										&& heartCheck
+												.isExpireInvaildRemoveChannelEnable())
+								{
+									DestoryChannel
+											.destory(
+													channel.getChannel(),
+													new IllegalStateException(
+															"未在要求的时间内收到心跳信息，服务端断开连接。"
+																	+ channel
+																			.getChannelName()));
+								}
+
+							}
+						}
+					}, heartCheck.getDelayTime(), heartCheck.getDelayTime(),
+					TimeUnit.MILLISECONDS);
+		}
 	}
 }

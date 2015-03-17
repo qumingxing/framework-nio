@@ -13,7 +13,7 @@ public class TestHybridTransferClinet
 	public static void main(String[] args)
 	{
 		MessageExecutor.register("123", new ScriptExecutor());
-		Client client = new Client("58.211.140.63", 10086);
+		Client client = new Client("172.18.70.109", 10086);
 		SelectorStrategy selectorStrategy = new SingleSelectorStrategy(2, 2);
 		selectorStrategy
 				.setHandleListen(new TestClientHybridDefaultHandleListener());

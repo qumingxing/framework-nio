@@ -1,0 +1,51 @@
+/*
+ * Copyright [2014-2015] [qumx of copyright owner]
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.qmx.framework.nio;
+
+import java.util.Arrays;
+
+/**
+ * 心跳消息单一的将字符串格式化后返回，该类实现了{@link MessageFormatToString} [72, 49, 0][H心跳标识1长度
+ * 0内容]
+ * 
+ * @author qmx 2014-12-12 上午10:52:41
+ * 
+ */
+public class MessageFormatHeartStringToString implements MessageFormatToString
+{
+	private final static String HEART = "H";
+	/**
+	 * 固定消息所以可以缓存
+	 */
+	private static byte sendBytes[];
+
+	@Override
+	public byte[] format(byte[] bytes)
+	{
+		// TODO Auto-generated method stub
+		if (null == sendBytes)
+		{
+			sendBytes = bytes;
+			byte[] lengthArr = (String.valueOf(HEART + sendBytes.length))
+					.getBytes();
+			sendBytes = Arrays.copyOf(sendBytes, sendBytes.length
+					+ lengthArr.length);
+			System.arraycopy(sendBytes, 0, sendBytes, lengthArr.length,
+					sendBytes.length - lengthArr.length);
+			System.arraycopy(lengthArr, 0, sendBytes, 0, lengthArr.length);
+		}
+		return sendBytes;
+	}
+}

@@ -62,6 +62,14 @@ public class BufferChannelFactory
 	 * 的实现内部。框架内部会在认证结束后回调该接口中的方法
 	 */
 	private CertificateInterface certificateInterface;
+	/**
+	 * 心跳机制
+	 */
+	private HeartCheck heartCheck;
+	/**
+	 * 客户端服务端模式
+	 */
+	private PointModel pointModel;
 
 	private BufferChannelFactory()
 	{
@@ -183,10 +191,31 @@ public class BufferChannelFactory
 			newBuffer.setHandleListener(handleListener);
 			newBuffer.setThreadPool(threadPool);
 			newBuffer.setSelector(selector);
+			newBuffer.setHeartCheck(heartCheck);
+			newBuffer.setPointModel(pointModel);
 			channelBuffers.put(clientSign, newBuffer);
 			return newBuffer;
 		}
 		return channelBuffer;
+	}
+
+	/**
+	 * 根据通道的唯一标识获取一个通道上的{@link ChannelBuffer}对象
+	 * 
+	 * @param socketChannel
+	 *            通道对象
+	 * @return {@link ChannelBuffer}
+	 */
+	public ChannelBuffer getBuffer(SocketChannel socketChannel)
+	{
+		String clientSign = socketChannel.socket().getRemoteSocketAddress()
+				.toString();
+		ChannelBuffer channelBuffer = channelBuffers.get(clientSign);
+		if (null != channelBuffer)
+		{
+			return channelBuffer;
+		}
+		return null;
 	}
 
 	/**
@@ -257,6 +286,38 @@ public class BufferChannelFactory
 			CertificateInterface certificateInterface)
 	{
 		this.certificateInterface = certificateInterface;
+	}
+
+	/**
+	 * 获取心跳配置对象
+	 * 
+	 * @return {@link HeartCheck}
+	 */
+	public HeartCheck getHeartCheck()
+	{
+		return heartCheck;
+	}
+
+	/**
+	 * 设置心跳配置对象
+	 * 
+	 * @param heartCheck
+	 *            {@link HeartCheck}
+	 */
+	public void setHeartCheck(HeartCheck heartCheck)
+	{
+		this.heartCheck = heartCheck;
+	}
+
+	/**
+	 * 客户端、服务端模式设置
+	 * 
+	 * @param pointModel
+	 *            {@link PointModel}
+	 */
+	public void setPointModel(PointModel pointModel)
+	{
+		this.pointModel = pointModel;
 	}
 
 }

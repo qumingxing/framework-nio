@@ -229,4 +229,28 @@ public interface ChannelBuffer
 	 * @return <code>true</code>已经认证过
 	 */
 	public boolean isCertificateAuthed();
+
+	/**
+	 * 获取心跳机制对象
+	 * 
+	 * @return {@link HeartCheck}
+	 */
+	public HeartCheck getHeartCheck();
+
+	/**
+	 * 设置心跳机制对象
+	 * 
+	 * @param heartCheck
+	 *            {@link HeartCheck}
+	 */
+	public void setHeartCheck(HeartCheck heartCheck);
+
+	/**
+	 * 设置客户端服务端模式
+	 * 
+	 * @param pointModel
+	 *            {@link PointModel}
+	 */
+	public void setPointModel(PointModel pointModel);
+
 }

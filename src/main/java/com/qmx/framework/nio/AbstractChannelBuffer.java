@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author qmx 2014-12-11 上午10:05:41
  * 
  */
-public abstract class AbstractChannelBuffer implements ChannelBuffer
+public abstract class AbstractChannelBuffer extends AbstractHeartChannelBuffer implements ChannelBuffer
 {
 	/**
 	 * 当前{@link ChannelBuffer}下的{@link SocketChannel}对象
@@ -79,6 +79,7 @@ public abstract class AbstractChannelBuffer implements ChannelBuffer
 	private boolean authMark;
 	private final static Logger log = LoggerFactory
 			.getLogger(AbstractChannelBuffer.class);
+	
 
 	@Override
 	public void setChannel(SocketChannel socketChannel)

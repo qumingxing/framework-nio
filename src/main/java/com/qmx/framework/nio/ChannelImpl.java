@@ -15,7 +15,6 @@
 package com.qmx.framework.nio;
 
 import java.nio.channels.SocketChannel;
-import java.util.Date;
 
 /**
  * 通道核心接口的实现类，主要用于设置通道的相关重要参数
@@ -46,7 +45,7 @@ public class ChannelImpl implements Channel
 	 * 信道的接受时间，该时间的作用主要是检查长时间未认证的客户端，根据用户设置的最大超时时间来断开未通过认证的通道 <br/>
 	 * 详细见{@link Channes} <code>startScheduledCheck</code>方法
 	 */
-	private Date acceptDate;
+	private long acceptDate;
 
 	@Override
 	public SocketChannel getChannel()
@@ -104,14 +103,14 @@ public class ChannelImpl implements Channel
 	}
 
 	@Override
-	public void setAcceptDate(Date date)
+	public void setAcceptDate(long date)
 	{
 		// TODO Auto-generated method stub
 		this.acceptDate = date;
 	}
 
 	@Override
-	public Date getAcceptDate()
+	public long getAcceptDate()
 	{
 		// TODO Auto-generated method stub
 		return this.acceptDate;

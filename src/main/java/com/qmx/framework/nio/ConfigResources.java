@@ -56,6 +56,10 @@ public class ConfigResources
 	 * 客户端重连间隔时间默认2000毫秒
 	 */
 	private long clientReconnectDelayTime = 2000;
+	/**
+	 * 自定义心跳机制{@link HeartCheck}
+	 */
+	private HeartCheck heartCheck;
 
 	/**
 	 * 获取服务端IP地址
@@ -252,6 +256,26 @@ public class ConfigResources
 	public void setClientReconnectDelayTime(long clientReconnectDelayTime)
 	{
 		this.clientReconnectDelayTime = clientReconnectDelayTime;
+	}
+
+	/**
+	 * 获取自定义的心跳机制
+	 * 
+	 * @return {@link HeartCheck}
+	 */
+	public HeartCheck getHeartCheck()
+	{
+		return heartCheck;
+	}
+
+	/**
+	 * 设置自定义的心跳机制{@link HeartCheck}
+	 * 
+	 * @param heartCheck
+	 */
+	public void setHeartCheck(HeartCheck heartCheck)
+	{
+		this.heartCheck = heartCheck;
 	}
 
 }

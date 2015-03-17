@@ -90,7 +90,7 @@ public class Server extends AbstractConnection
 	{
 		serverSocketChannel = ServerSocketChannel.open();
 		// 表示是否允许重用Socket所绑定的本地地址。
-		serverSocketChannel.socket().setReuseAddress(true);
+		//serverSocketChannel.socket().setReuseAddress(true);
 		serverSocketChannel.configureBlocking(false);
 	}
 

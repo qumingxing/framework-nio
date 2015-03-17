@@ -20,7 +20,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -81,23 +80,40 @@ public class SelectProcess
 	 */
 	private int defaultBufferCapacity = 2048;
 
-	public SelectProcess(int writePoolSize, int readPoolSize)
+	/**
+	 * 构造一个设置读、写线程池大小的{@link SelectProcess}对象
+	 * 
+	 * @param writePoolSize
+	 *            写线程池大小
+	 * @param readPoolSize
+	 *            读线程池大小
+	 */
+	protected SelectProcess(int writePoolSize, int readPoolSize)
 	{
 		WRITE_POOL.setPoolSize(writePoolSize);
 		WRITE_POOL.createThreadPool();
 		MessageAdapter.setThreadPool(WRITE_POOL);
-		// recieveMessage = new RecieveMessage(writePoolSize);
 		workTaskThreadPool.setPoolSize(readPoolSize);
 		workTaskThreadPool.createThreadPool();
 		DestoryChannel.setWorkTaskThreadPool(workTaskThreadPool);
 	}
 
-	public SelectProcess(int writePoolSize, int readPoolSize, int synchPoolSize)
+	/**
+	 * 构造一个设置读、写、同步等待线程池大小的{@link SelectProcess}对象
+	 * 
+	 * @param writePoolSize
+	 *            写线程池大小
+	 * @param readPoolSize
+	 *            读线程池大小
+	 * @param synchPoolSize
+	 *            同步发送消息等待线程池大小
+	 */
+	protected SelectProcess(int writePoolSize, int readPoolSize,
+			int synchPoolSize)
 	{
 		WRITE_POOL.setPoolSize(writePoolSize);
 		WRITE_POOL.createThreadPool();
 		MessageAdapter.setThreadPool(WRITE_POOL);
-		// recieveMessage = new RecieveMessage(writePoolSize);
 		workTaskThreadPool.setPoolSize(readPoolSize);
 		workTaskThreadPool.createThreadPool();
 		SYNCHRONIZED_THREAD_POOL.setPoolSize(synchPoolSize);
@@ -105,6 +121,12 @@ public class SelectProcess
 		DestoryChannel.setWorkTaskThreadPool(workTaskThreadPool);
 	}
 
+	/**
+	 * 核心选择器业务处理
+	 * 
+	 * @param keys
+	 *            选择器键
+	 */
 	protected void select(Set<SelectionKey> keys)
 	{
 		Iterator<SelectionKey> iter = keys.iterator();
@@ -124,21 +146,19 @@ public class SelectProcess
 				try
 				{
 					SocketChannel socketChannel = serverSocketChannel.accept();
-					// ByteChannel byteChannel = socketChannel;byteChannel.r
 					socketChannel.socket().setSendBufferSize(8096);
 					socketChannel.socket().setReceiveBufferSize(8096);
-					// socketChannel.socket().setTcpNoDelay(true);
 					socketChannel.configureBlocking(false);
+					String channelName = socketChannel.socket()
+							.getRemoteSocketAddress().toString();
 					Channel channel = new ChannelImpl();
 					channel.setChannel(socketChannel);
-					channel.setAcceptDate(new Date());
+					channel.setAcceptDate(System.currentTimeMillis());
+					channel.setChannelName(channelName);
 					if (bufferChannelFactory.isCertificateAuth())
 						channel.setCertificateAuth(true);
-					Channels.addChannel(socketChannel.socket()
-							.getRemoteSocketAddress().toString(), channel);
+					Channels.addChannel(channelName, channel);
 					accept(socketChannel);
-
-					// socketChannel.register(selector, SelectionKey.OP_READ);
 				} catch (IOException e)
 				{
 					exception(null, e);
@@ -151,13 +171,13 @@ public class SelectProcess
 					try
 					{
 						socketChannel.finishConnect();
+						String channelName = socketChannel.socket()
+								.getRemoteSocketAddress().toString();
 						Channel channel = new ChannelImpl();
 						channel.setChannel(socketChannel);
-						Channels.addChannel(socketChannel.socket()
-								.getRemoteSocketAddress().toString(), channel);
+						channel.setChannelName(channelName);
+						Channels.addChannel(channelName, channel);
 						connect(socketChannel);
-						// socketChannel.register(selector,
-						// SelectionKey.OP_WRITE);
 					} catch (IOException e)
 					{
 						// TODO Auto-generated catch block
@@ -177,6 +197,12 @@ public class SelectProcess
 		}
 	}
 
+	/**
+	 * 接受一个新的客户端连接
+	 * 
+	 * @param socketChannel
+	 *            客户端通道
+	 */
 	private void accept(SocketChannel socketChannel)
 	{
 		ChannelBuffer channelBuffer = getChannelBufer(socketChannel);
@@ -185,6 +211,14 @@ public class SelectProcess
 		workTaskThreadPool.multiExecute(methodWorker);
 	}
 
+	/**
+	 * 通道发生异常
+	 * 
+	 * @param socketChannel
+	 *            通道对象
+	 * @param e
+	 *            异常对象
+	 */
 	private void exception(SocketChannel socketChannel, Exception e)
 	{
 		ChannelBuffer channelBuffer = getChannelBufer(socketChannel);
@@ -194,6 +228,12 @@ public class SelectProcess
 		workTaskThreadPool.multiExecute(methodWorker);
 	}
 
+	/**
+	 * 客户端已连接上一个服务端
+	 * 
+	 * @param socketChannel
+	 *            通道对象
+	 */
 	private void connect(SocketChannel socketChannel)
 	{
 		// 设置连接状态为已连接
@@ -202,8 +242,37 @@ public class SelectProcess
 		MethodWorker methodWorker = newMethodWorker(channelBuffer,
 				HandleEnum.connect);
 		workTaskThreadPool.multiExecute(methodWorker);
+		heartProcess();
 	}
 
+	/**
+	 * 客户端发送心跳机制执行<br/>
+	 * 只有是客户端并且启用了心跳机制才可以执行。
+	 */
+	private void heartProcess()
+	{
+		if (null == config)
+			return;
+		if (null != config.getHeartCheck()
+				&& config.getHeartCheck().isEnableHeart())
+		{
+			HeartCheck heartCheck = config.getHeartCheck();
+			if (null != config.getPointModel()
+					&& config.getPointModel() == PointModel.CLIENT)
+			{
+				HeartMessageAdapter.getInstance().executeHeart(heartCheck);
+			}
+		}
+	}
+
+	/**
+	 * 客户端\服务端读取消息内容
+	 * 
+	 * @param channel
+	 *            消息通道
+	 * @param key
+	 *            选择键
+	 */
 	private void read(final SocketChannel channel, final SelectionKey key)
 	{
 
@@ -232,24 +301,11 @@ public class SelectProcess
 			if (temp == -1)
 			{
 				key.cancel();
-				/*
-				 * channel.close(); ChannelBuffer channelBuffer =
-				 * getChannelBufer(channel); MethodWorker methodWorker =
-				 * newMethodWorker(channelBuffer, HandleEnum.close);
-				 * workTaskThreadPool.multiExecute(methodWorker);
-				 */
 				DestoryChannel.destory(channel, null);
 			}
 		} catch (IOException e)
 		{
 			key.cancel();
-			// channel.close();
-			/*
-			 * ChannelBuffer channelBuffer = getChannelBufer(channel);
-			 * MethodWorker methodWorker = newMethodWorker(channelBuffer,
-			 * HandleEnum.exception); methodWorker.setException(e);
-			 * workTaskThreadPool.multiExecute(methodWorker);
-			 */
 			DestoryChannel.destory(channel, e);
 		} finally
 		{
@@ -257,6 +313,12 @@ public class SelectProcess
 		}
 	}
 
+	/**
+	 * 服务端接受到一个新的连接或客户端第一次连接成功一个服务端后执行写方法
+	 * 
+	 * @param socketChannel
+	 *            消息通道
+	 */
 	private void write(SocketChannel socketChannel)
 	{
 		ChannelBuffer channelBuffer = getChannelBufer(socketChannel);
@@ -265,24 +327,44 @@ public class SelectProcess
 		workTaskThreadPool.multiExecute(methodWorker);
 	}
 
+	/**
+	 * 获取设置的{@link HandleListener}对象
+	 * 
+	 * @return {@link HandleListener}
+	 */
 	public HandleListener getHandleListener()
 	{
 		return handleListener;
 	}
 
+	/**
+	 * 设置{@link HandleListener}对象
+	 * 
+	 * @param handleListener
+	 *            {@link HandleListener}
+	 */
 	public void setHandleListener(HandleListener handleListener)
 	{
 		this.handleListener = handleListener;
 	}
 
+	/**
+	 * 设置全局的消息上下文环境
+	 * 
+	 * @param context
+	 *            {@link MessageContext}
+	 */
 	public void setMessageContext(MessageContext context)
 	{
 		this.messageContext = context;
 		this.messageContext.setDefaultMessageContext(messageContext);
-		// Channels.setMessageContext(messageContext);
-		// recieveMessage.setMessageContext(this.messageContext);
 	}
 
+	/**
+	 * 获取消息的上下文环境
+	 * 
+	 * @return {@link MessageContext}
+	 */
 	public MessageContext getMessageContext()
 	{
 		if (null != this.messageContext)
@@ -291,8 +373,6 @@ public class SelectProcess
 		}
 		setMessageContext(MessageContext.getDefaultMessageContext());
 		return this.messageContext;
-		// Channels.setMessageContext(messageContext);
-		// recieveMessage.setMessageContext(this.messageContext);
 	}
 
 	public Selector getSelector()
@@ -330,16 +410,30 @@ public class SelectProcess
 		return methodWorker;
 	}
 
+	/**
+	 * 设置消息接受缓冲区的类型
+	 * 
+	 * @param bufferType
+	 *            {@link ChannelBuffer}
+	 */
 	public void setBufferType(Class<? extends ChannelBuffer> bufferType)
 	{
 		this.bufferType = bufferType;
 	}
 
+	/**
+	 * 设置全局的资源配置对象
+	 * 
+	 * @param config
+	 *            {@link ConfigResources}
+	 */
 	public void setConfig(ConfigResources config)
 	{
 		this.config = config;
+		// 服务端专有的业务配置
 		if (config.getPointModel() == PointModel.SERVER)
 		{
+			// 服务端认证相关配置
 			if (this.config.isCertificateAuth())
 			{
 				bufferChannelFactory.setCertificateAuth(true);
@@ -348,10 +442,21 @@ public class SelectProcess
 				bufferChannelFactory.setCertificateInterface(config
 						.getCertificateInterface());
 			}
+			// 服务端心跳检测配置
+			bufferChannelFactory.setHeartCheck(config.getHeartCheck());
+			Channels.checkHeart(config.getHeartCheck());
 		}
+		// 公共配置
+		bufferChannelFactory.setPointModel(config.getPointModel());
 		DestoryChannel.setConfig(this.config);
 	}
 
+	/**
+	 * 服务端启动检查认证客户端的有效性
+	 * 
+	 * @param scheduledCheckValid
+	 *            {@link ScheduledCheckValid}
+	 */
 	public void setScheduledCheckValid(ScheduledCheckValid scheduledCheckValid)
 	{
 		// TODO Auto-generated method stub
