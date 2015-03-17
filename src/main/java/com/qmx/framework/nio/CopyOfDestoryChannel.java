@@ -111,7 +111,7 @@ public class CopyOfDestoryChannel
 		if (flag)
 		{
 			ChannelBuffer channelBuffer = BufferChannelFactory
-					.getBuferChannelFactory().removeBuffer(channel);
+					.getBuferChannelFactory().removeBuffer(channel.socket().getRemoteSocketAddress().toString());
 			if (null != channelBuffer)
 			{
 				notifyLisener(channelBuffer, ex);

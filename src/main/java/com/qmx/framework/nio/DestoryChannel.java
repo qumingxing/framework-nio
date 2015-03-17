@@ -15,8 +15,6 @@
 package com.qmx.framework.nio;
 
 import java.io.IOException;
-import java.nio.channels.SocketChannel;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,21 +103,21 @@ public class DestoryChannel
 	 * @param ex
 	 *            可能发生的外部的异常对象
 	 */
-	public static void destory(SocketChannel channel, Exception ex)
+	public static void destory(Channel channel, Exception ex)// SocketChannel
 	{
-		boolean flag = channel.isConnected();
-		if (flag)
+		if (null != channel)
 		{
 			ChannelBuffer channelBuffer = BufferChannelFactory
-					.getBuferChannelFactory().removeBuffer(channel);
+					.getBuferChannelFactory().removeBuffer(
+							channel.getChannelName());
 			if (null != channelBuffer)
 			{
 				notifyLisener(channelBuffer, ex);
 			}
-			Channels.removeChannel(channel);
+			Channels.removeChannel(channel.getChannelName());
 			try
 			{
-				channel.close();
+				channel.getChannel().close();
 			} catch (IOException e)
 			{
 				// TODO Auto-generated catch block
@@ -128,26 +126,16 @@ public class DestoryChannel
 				log.error("异常->{}\n{}", channelBuffer.getChannelName(),
 						stringWriter.getString());
 			}
-		} else if (clientModelCheck())
-		{
-
-			List<ChannelBuffer> buffers = BufferChannelFactory
-					.getBuferChannelFactory().removeAllBuffer();
-			if (buffers.size() > 0)
-			{
-				ChannelBuffer channelBuffer = buffers.get(0);
-				Channels.removeChannel(channelBuffer.getChannelName());
-				notifyLisener(channelBuffer, ex);
-			}
 		}
 		// false 不会进行重连
 		if (clientModelCheck())
 		{
-			CURRENT_CONNECT_STATE = UNCONNECT;
 			synchronized (waitForReconnect)
 			{
-				if (CURRENT_CONNECT_STATE == UNCONNECT)
+				if (CURRENT_CONNECT_STATE == CONNECTED
+						|| CURRENT_CONNECT_STATE == CONNECTING)
 				{
+					CURRENT_CONNECT_STATE = UNCONNECT;
 					waitForReconnect.notifyAll();
 				}
 			}

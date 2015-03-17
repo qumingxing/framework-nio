@@ -110,7 +110,7 @@ public class LengthSplitChannelBuffer extends AbstractChannelBuffer
 		} catch (Exception e)
 		{
 			logger.info("数据读取错误" + e.getMessage());
-			DestoryChannel.destory(super.getSocketChannel(), e);
+			DestoryChannel.destory(super.getChannel(), e);
 		}
 	}
 

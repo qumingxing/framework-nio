@@ -93,15 +93,13 @@ public class BufferChannelFactory
 	 *            缓冲区对应的通道
 	 * @return 返回一个空的或已移出成功的缓冲区对象
 	 */
-	public ChannelBuffer removeBuffer(SocketChannel socketChannel)
+	public ChannelBuffer removeBuffer(String channelName)
 	{
-		String clientSign = socketChannel.socket().getRemoteSocketAddress()
-				.toString();
-		ChannelBuffer channelBuffer = channelBuffers.remove(clientSign);
+		ChannelBuffer channelBuffer = channelBuffers.remove(channelName);
 		if (null != channelBuffer)
 		{
 			channelBuffer.clearBytes();
-			logger.info("remove channelBuffer success" + socketChannel);
+			logger.info("remove channelBuffer success" + channelName);
 			return channelBuffer;
 		}
 		return null;

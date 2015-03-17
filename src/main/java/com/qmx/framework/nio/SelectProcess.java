@@ -168,12 +168,13 @@ public class SelectProcess
 				SocketChannel socketChannel = (SocketChannel) key.channel();
 				if (socketChannel.isConnectionPending())
 				{
+					Channel channel = null;
 					try
 					{
 						socketChannel.finishConnect();
 						String channelName = socketChannel.socket()
 								.getRemoteSocketAddress().toString();
-						Channel channel = new ChannelImpl();
+						channel = new ChannelImpl();
 						channel.setChannel(socketChannel);
 						channel.setChannelName(channelName);
 						Channels.addChannel(channelName, channel);
@@ -181,7 +182,7 @@ public class SelectProcess
 					} catch (IOException e)
 					{
 						// TODO Auto-generated catch block
-						DestoryChannel.destory(socketChannel, e);
+						DestoryChannel.destory(channel, e);
 					}
 				}
 			} else if (key.isReadable())
@@ -301,12 +302,12 @@ public class SelectProcess
 			if (temp == -1)
 			{
 				key.cancel();
-				DestoryChannel.destory(channel, null);
+				DestoryChannel.destory(Channels.getChannel(channel), null);
 			}
 		} catch (IOException e)
 		{
 			key.cancel();
-			DestoryChannel.destory(channel, e);
+			DestoryChannel.destory(Channels.getChannel(channel), e);
 		} finally
 		{
 			buffersPool.realse(byteBuffer);

@@ -145,13 +145,13 @@ public class Channels extends MessageAdapter
 	/**
 	 * 静态方法移除一个客户端，或服务端，当客户端或服务端断开后双方都会移除各自维护的通道对象。如果认证不通过的对象也会移除。
 	 * 
-	 * @param remoteSocketAddress
+	 * @param channelName
 	 *            通道对象的
 	 *            <code>socketChannel.socket().getRemoteSocketAddress()<code>
 	 */
-	public static void removeChannel(String remoteSocketAddress)
+	public static void removeChannel(String channelName)
 	{
-		channels.remove(remoteSocketAddress);
+		channels.remove(channelName);
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class Channels extends MessageAdapter
 								.currentTimeMillis())
 						{
 							DestoryChannel.destory(
-									entry.getValue().getChannel(),
+									entry.getValue(),
 									new CertificateAuthException(
 											"到达最大等待身份认证许可时间["
 													+ acceptDate
@@ -405,6 +405,38 @@ public class Channels extends MessageAdapter
 	}
 
 	/**
+	 * 根据通道名称获取一个通道对象
+	 * 
+	 * @param channelName
+	 *            通道名称
+	 * @return {@link Channel}通道对象
+	 */
+	protected static Channel getChannel(String channelName)
+	{
+		if (null != channelName)
+			return channels.get(channelName);
+		return null;
+	}
+
+	/**
+	 * 根据底层的通道对象获取一个通道对象
+	 * 
+	 * @param socketChannel
+	 *            底层通道
+	 * @return {@link Channel}通道对象
+	 */
+	public static Channel getChannel(SocketChannel socketChannel)
+	{
+		if (socketChannel.isConnected())
+		{
+			String clientSign = socketChannel.socket().getRemoteSocketAddress()
+					.toString();
+			return channels.get(clientSign);
+		}
+		return null;
+	}
+
+	/**
 	 * 将通道的acceptTime 刷新为当前时间{@link AbstractHeartChannelBuffer}<br/>
 	 * 断网的时候服务端和客户端可能都无法感知到对方的状态(尤其Linux下)，导致大量资源占用没有释放，
 	 * 
@@ -457,7 +489,7 @@ public class Channels extends MessageAdapter
 								{
 									DestoryChannel
 											.destory(
-													channel.getChannel(),
+													channel,
 													new IllegalStateException(
 															"未在要求的时间内收到心跳信息，服务端断开连接。"
 																	+ channel

@@ -128,7 +128,7 @@ public class Client extends AbstractConnection
 		// unreachable(主机不可达)”，说明对方主机并没有崩溃，但是不可达，这种情况下待处理错误被置为
 		// EHOSTUNREACH。
 		//socketChannel.socket().setKeepAlive(true);// 长时间处理空闲是否要关闭,默认false
-		socketChannel.socket().setTcpNoDelay(true);
+		//socketChannel.socket().setTcpNoDelay(true);
 		// socketChannel.socket().setSoLinger(true, 0);
 		socketChannel.configureBlocking(false);
 	}

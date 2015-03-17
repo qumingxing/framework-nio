@@ -78,7 +78,7 @@ public class SingleWriteThreadPool implements ThreadPool
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block
-			DestoryChannel.destory(socketChannel, e);
+			DestoryChannel.destory(writeWorker.getChannel(), e);
 		} finally
 		{
 			byteBuffer.clear();

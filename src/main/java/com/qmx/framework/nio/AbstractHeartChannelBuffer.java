@@ -14,6 +14,9 @@
  */
 package com.qmx.framework.nio;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 心跳业务逻辑处理
  * 
@@ -32,6 +35,8 @@ public abstract class AbstractHeartChannelBuffer
 	 * 心跳机制实现
 	 */
 	private HeartCheck heartCheck;
+	private final static Logger log = LoggerFactory
+			.getLogger(AbstractHeartChannelBuffer.class);
 
 	public PointModel getPointModel()
 	{
@@ -52,7 +57,10 @@ public abstract class AbstractHeartChannelBuffer
 		{
 			if (avaliableLength >= 3)
 			{
-				System.out.println("检测到心跳" + channelName);
+				if (log.isInfoEnabled())
+				{
+					log.info("检测到心跳->{}", channelName);
+				}
 				flushAcceptTime(channelName);
 				return 3;
 			} else

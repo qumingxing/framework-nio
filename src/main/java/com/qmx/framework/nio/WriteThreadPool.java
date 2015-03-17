@@ -101,7 +101,7 @@ public class WriteThreadPool implements ThreadPool
 					}
 				} catch (IOException e)
 				{
-					DestoryChannel.destory(socketChannel, e);
+					DestoryChannel.destory(writeWorker.getChannel(), e);
 				} finally
 				{
 					sendChannelBuffersPool.realse(byteBuffer);

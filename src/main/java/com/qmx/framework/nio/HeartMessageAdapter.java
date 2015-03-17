@@ -30,7 +30,7 @@ public class HeartMessageAdapter
 	/**
 	 * 消息发送对象实例
 	 */
-	private static final Channels CHANNELS = Channels.newChannel(null);
+	private static volatile Channels CHANNELS = Channels.newChannel(null);
 	/**
 	 * 定时任务对象
 	 */
@@ -39,11 +39,12 @@ public class HeartMessageAdapter
 	/**
 	 * 客户端通道对象
 	 */
-	private final Channel channel;
+	private volatile Channel channel;
 	/**
 	 * 唯一的实例
 	 */
 	private final static HeartMessageAdapter HEART_MESSAGE_ADAPTER = new HeartMessageAdapter();
+	private volatile static boolean started;
 
 	private HeartMessageAdapter()
 	{
@@ -65,13 +66,29 @@ public class HeartMessageAdapter
 	}
 
 	/**
-	 * 执行心跳发送
+	 * 执行心跳发送<br/>
+	 * 客户端重连后会导致多次调用该方法所以通过started状态标识，判断当前通道是否与之前的通道是一个引用，如果是直接结束方法执行，
+	 * 否则重新设置新的通道对象
 	 * 
 	 * @param heartCheck
 	 *            {@link HeartCheck}
 	 */
 	protected void executeHeart(final HeartCheck heartCheck)
 	{
+		if (started)
+		{
+			Channel newChannel = CHANNELS.getFirstChannel();
+			if (null != newChannel && newChannel == channel)
+			{
+				return;
+			} else
+			{
+				channel = newChannel;
+				CHANNELS.setChannel(newChannel);
+				return;
+			}
+		}
+		started = true;
 		SCHEDULED_THREAD_POOL_EXECUTOR.scheduleWithFixedDelay(new Runnable()
 		{
 
