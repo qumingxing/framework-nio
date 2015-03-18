@@ -168,20 +168,24 @@ public class SelectProcess
 				SocketChannel socketChannel = (SocketChannel) key.channel();
 				if (socketChannel.isConnectionPending())
 				{
-					Channel channel = null;
+					Channel channel = new ChannelImpl();
 					try
 					{
 						socketChannel.finishConnect();
 						String channelName = socketChannel.socket()
 								.getRemoteSocketAddress().toString();
-						channel = new ChannelImpl();
 						channel.setChannel(socketChannel);
 						channel.setChannelName(channelName);
 						Channels.addChannel(channelName, channel);
+						// 设置连接状态为已连接
+						DestoryChannel.CURRENT_CONNECT_STATE = ChannelStatus.CONNECTED;
+						channel.setChannelStatus(ChannelStatus.CONNECTED);
 						connect(socketChannel);
 					} catch (IOException e)
 					{
 						// TODO Auto-generated catch block
+						DestoryChannel.CURRENT_CONNECT_STATE = ChannelStatus.UNCONNECT;
+						channel.setChannelStatus(ChannelStatus.UNCONNECT);
 						DestoryChannel.destory(channel, e);
 					}
 				}
@@ -237,8 +241,6 @@ public class SelectProcess
 	 */
 	private void connect(SocketChannel socketChannel)
 	{
-		// 设置连接状态为已连接
-		DestoryChannel.CURRENT_CONNECT_STATE = DestoryChannel.CONNECTED;
 		ChannelBuffer channelBuffer = getChannelBufer(socketChannel);
 		MethodWorker methodWorker = newMethodWorker(channelBuffer,
 				HandleEnum.connect);

@@ -127,4 +127,19 @@ public interface Channel
 	 * @return 接受时间
 	 */
 	public long getAcceptDate();
+
+	/**
+	 * 获取当前通道的状态
+	 * 
+	 * @return {@link ChannelStatus}UNCONNECT、CONNECTING、CONNECTED
+	 */
+	public ChannelStatus getChannelStatus();
+
+	/**
+	 * 设置当前通道的状态
+	 * 
+	 * @param channelStatus
+	 *            {@link ChannelStatus}UNCONNECT、CONNECTING、CONNECTED
+	 */
+	public void setChannelStatus(ChannelStatus channelStatus);
 }

@@ -43,21 +43,9 @@ public class DestoryChannel
 	private static final Logger logger = LoggerFactory
 			.getLogger(DestoryChannel.class);
 	/**
-	 * 未连接
-	 */
-	protected static final int UNCONNECT = 0x00;
-	/**
-	 * 连接中
-	 */
-	protected static final int CONNECTING = 0x01;
-	/**
-	 * 已连接
-	 */
-	protected static final int CONNECTED = 0x02;
-	/**
 	 * 当前连接状态
 	 */
-	protected static volatile int CURRENT_CONNECT_STATE = CONNECTED;
+	protected static volatile ChannelStatus CURRENT_CONNECT_STATE = ChannelStatus.CONNECTED;
 	/**
 	 * 客户端正常连接的时候该对象会调用{@link Object}的<code>wait()</code>阻塞等待,连接断开后会
 	 * <code>notify()</code>该对象恢复重连工作。
@@ -105,8 +93,24 @@ public class DestoryChannel
 	 */
 	public static void destory(Channel channel, Exception ex)// SocketChannel
 	{
-		if (null != channel)
+		if (null != channel && null != channel.getChannel())
 		{
+			try
+			{
+				if (channel.getChannel().isOpen())
+				{
+					channel.setChannelStatus(ChannelStatus.UNCONNECT);
+					channel.getChannel().close();
+				}
+			} catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				StringPrintWriter stringWriter = new StringPrintWriter();
+				e.printStackTrace(stringWriter);
+				log.error("异常->{}\n{}", channel.getChannelName(),
+						stringWriter.getString());
+			}
+			Channels.removeChannel(channel.getChannelName());
 			ChannelBuffer channelBuffer = BufferChannelFactory
 					.getBuferChannelFactory().removeBuffer(
 							channel.getChannelName());
@@ -114,29 +118,19 @@ public class DestoryChannel
 			{
 				notifyLisener(channelBuffer, ex);
 			}
-			Channels.removeChannel(channel.getChannelName());
-			try
-			{
-				channel.getChannel().close();
-			} catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				StringPrintWriter stringWriter = new StringPrintWriter();
-				e.printStackTrace(stringWriter);
-				log.error("异常->{}\n{}", channelBuffer.getChannelName(),
-						stringWriter.getString());
-			}
 		}
 		// false 不会进行重连
 		if (clientModelCheck())
 		{
 			synchronized (waitForReconnect)
 			{
-				if (CURRENT_CONNECT_STATE == CONNECTED
-						|| CURRENT_CONNECT_STATE == CONNECTING)
+				if (null != channel)
 				{
-					CURRENT_CONNECT_STATE = UNCONNECT;
-					waitForReconnect.notifyAll();
+					if (channel.getChannelStatus() == ChannelStatus.UNCONNECT)
+					{
+						channel.setChannelStatus(ChannelStatus.CONNECTING);
+						waitForReconnect.notifyAll();
+					}
 				}
 			}
 		}
@@ -158,8 +152,8 @@ public class DestoryChannel
 				{
 					synchronized (waitForReconnect)
 					{
-						if (CURRENT_CONNECT_STATE == CONNECTED
-								|| CURRENT_CONNECT_STATE == CONNECTING)
+						if (CURRENT_CONNECT_STATE == ChannelStatus.CONNECTED
+								|| CURRENT_CONNECT_STATE == ChannelStatus.CONNECTING)
 							try
 							{
 								waitForReconnect.wait();
@@ -169,7 +163,7 @@ public class DestoryChannel
 								e1.printStackTrace();
 							}
 						// 连接中
-						CURRENT_CONNECT_STATE = CONNECTING;
+						CURRENT_CONNECT_STATE = ChannelStatus.CONNECTING;
 						AbstractConnection connection = config.getConnection();
 						try
 						{
@@ -181,19 +175,17 @@ public class DestoryChannel
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-
+						logger.debug("重连开始" + reconnectCount++);
+						try
+						{
+							Thread.sleep(config.getClientReconnectDelayTime());
+						} catch (InterruptedException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						if (null != connection)
 						{
-							logger.debug("重连开始" + reconnectCount++);
-							try
-							{
-								Thread.sleep(config
-										.getClientReconnectDelayTime());
-							} catch (InterruptedException e)
-							{
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
 							connection.start();
 						}
 					}

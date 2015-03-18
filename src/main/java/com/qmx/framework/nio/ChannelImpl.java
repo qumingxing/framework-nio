@@ -46,6 +46,10 @@ public class ChannelImpl implements Channel
 	 * 详细见{@link Channes} <code>startScheduledCheck</code>方法
 	 */
 	private long acceptDate;
+	/**
+	 * 当前通道状态{@link ChannelStatus}
+	 */
+	private ChannelStatus channelStatus = ChannelStatus.UNCONNECT;
 
 	@Override
 	public SocketChannel getChannel()
@@ -114,6 +118,20 @@ public class ChannelImpl implements Channel
 	{
 		// TODO Auto-generated method stub
 		return this.acceptDate;
+	}
+
+	@Override
+	public ChannelStatus getChannelStatus()
+	{
+		// TODO Auto-generated method stub
+		return channelStatus;
+	}
+
+	@Override
+	public void setChannelStatus(ChannelStatus channelStatus)
+	{
+		// TODO Auto-generated method stub
+		this.channelStatus = channelStatus;
 	}
 
 }
