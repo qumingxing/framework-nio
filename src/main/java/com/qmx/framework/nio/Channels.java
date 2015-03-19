@@ -443,9 +443,15 @@ public class Channels extends MessageAdapter
 	 * @param channelName
 	 *            通道名称
 	 */
-	protected static void flushAcceptTime(String channelName)
+	protected static void flushAcceptTime(HeartCheck heartCheck,
+			String channelName)
 	{
 		channels.get(channelName).setAcceptDate(System.currentTimeMillis());
+		if (null != heartCheck && null != heartCheck.getHeartStateListener())
+		{
+			heartCheck.getHeartStateListener().checkHeart(
+					getChannel(channelName));
+		}
 	}
 
 	/**
@@ -494,6 +500,12 @@ public class Channels extends MessageAdapter
 															"未在要求的时间内收到心跳信息，服务端断开连接。"
 																	+ channel
 																			.getChannelName()));
+									if (null != heartCheck
+											.getHeartStateListener())
+									{
+										heartCheck.getHeartStateListener()
+												.uncheckHeart(channel);
+									}
 								}
 
 							}

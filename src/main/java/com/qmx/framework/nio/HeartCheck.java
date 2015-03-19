@@ -53,6 +53,10 @@ public class HeartCheck
 	 */
 	private int hearMessageLength;// H10
 	private final static String HEART = "H";
+	/**
+	 * 心跳监听器
+	 */
+	private HeartStateListener heartStateListener;
 
 	/**
 	 * 
@@ -136,6 +140,27 @@ public class HeartCheck
 			hearMessageLength = lengthArr.length;
 		}
 		return hearMessageLength;
+	}
+
+	/**
+	 * 获取心跳监听器
+	 * 
+	 * @return {@link HeartStateListener}
+	 */
+	public HeartStateListener getHeartStateListener()
+	{
+		return heartStateListener;
+	}
+
+	/**
+	 * 设置心跳监听器
+	 * 
+	 * @param heartStateListener
+	 *            {@link HeartStateListener}
+	 */
+	public void setHeartStateListener(HeartStateListener heartStateListener)
+	{
+		this.heartStateListener = heartStateListener;
 	}
 
 }

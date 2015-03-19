@@ -3,6 +3,7 @@ import com.qmx.framework.nio.LengthSplitChannelBuffer;
 import com.qmx.framework.nio.SelectorStrategy;
 import com.qmx.framework.nio.Server;
 import com.qmx.framework.nio.SingleSelectorStrategy;
+import com.qmx.framework.nio.listener.HeartStateListenerImpl;
 import com.qmx.framework.nio.listener.TestServerDefaultHandleListener;
 public class TestHeartTextTransferServer
 {
@@ -10,6 +11,7 @@ public class TestHeartTextTransferServer
 	{
 		HeartCheck heartCheck = new HeartCheck(true, 6000);
 		heartCheck.setExpireInvaildRemoveChannelEnable(true);
+		heartCheck.setHeartStateListener(new HeartStateListenerImpl());
 		ConfigResources config = new ConfigResources();
 		config.setPort(10086);
 		config.setPointModel(PointModel.SERVER);

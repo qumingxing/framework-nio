@@ -76,7 +76,7 @@ public abstract class AbstractHeartChannelBuffer
 	 */
 	private void flushAcceptTime(String channelName)
 	{
-		Channels.flushAcceptTime(channelName);
+		Channels.flushAcceptTime(heartCheck, channelName);
 	}
 
 	/**
