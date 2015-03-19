@@ -102,6 +102,10 @@ public class MethodWorker implements Worker
 		Channel channel = new ChannelImpl();
 		channel.setChannel(channelBuffer.getSocketChannel());
 		channel.setChannelName(channelBuffer.getChannelName());
+		if (channelBuffer.getSocketChannel().isOpen())
+		{
+			channel.setChannelStatus(ChannelStatus.CONNECTED);
+		}
 		event.setChannel(channel);
 		EncoderAndDecoder encoderAndDecoder = channelBuffer.getMessageContext()
 				.getEncoderAndDecoderFactory().getInstance(dataType);

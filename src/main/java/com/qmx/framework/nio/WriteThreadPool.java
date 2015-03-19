@@ -95,9 +95,12 @@ public class WriteThreadPool implements ThreadPool
 						.getChannel();
 				try
 				{
-					while (byteBuffer.hasRemaining())
+					if (socketChannel.isOpen())
 					{
-						socketChannel.write(byteBuffer);
+						while (byteBuffer.hasRemaining())
+						{
+							socketChannel.write(byteBuffer);
+						}
 					}
 				} catch (IOException e)
 				{
