@@ -90,12 +90,7 @@ public class SelectProcess
 	 */
 	protected SelectProcess(int writePoolSize, int readPoolSize)
 	{
-		WRITE_POOL.setPoolSize(writePoolSize);
-		WRITE_POOL.createThreadPool();
-		MessageAdapter.setThreadPool(WRITE_POOL);
-		workTaskThreadPool.setPoolSize(readPoolSize);
-		workTaskThreadPool.createThreadPool();
-		DestoryChannel.setWorkTaskThreadPool(workTaskThreadPool);
+		this(writePoolSize, readPoolSize, 0);
 	}
 
 	/**
@@ -116,9 +111,13 @@ public class SelectProcess
 		MessageAdapter.setThreadPool(WRITE_POOL);
 		workTaskThreadPool.setPoolSize(readPoolSize);
 		workTaskThreadPool.createThreadPool();
-		SYNCHRONIZED_THREAD_POOL.setPoolSize(synchPoolSize);
-		SYNCHRONIZED_THREAD_POOL.createThreadPool();
+		bufferChannelFactory.setWorkTaskThreadPool(workTaskThreadPool);
 		DestoryChannel.setWorkTaskThreadPool(workTaskThreadPool);
+		if (synchPoolSize > 0)
+		{
+			SYNCHRONIZED_THREAD_POOL.setPoolSize(synchPoolSize);
+			SYNCHRONIZED_THREAD_POOL.createThreadPool();
+		}
 	}
 
 	/**
@@ -349,6 +348,7 @@ public class SelectProcess
 	public void setHandleListener(HandleListener handleListener)
 	{
 		this.handleListener = handleListener;
+		bufferChannelFactory.setHandleListener(handleListener);
 	}
 
 	/**
@@ -386,6 +386,7 @@ public class SelectProcess
 	public void setSelector(Selector selector)
 	{
 		this.selector = selector;
+		bufferChannelFactory.setSelector(this.selector);
 	}
 
 	public ChannelBuffer getChannelBufer(SocketChannel channel)
@@ -399,8 +400,7 @@ public class SelectProcess
 			setBufferType(DefaultChannelBuffer.class);
 		}
 		ChannelBuffer channelBuffer = bufferChannelFactory.getBuffer(channel,
-				messageContext, handleListener, workTaskThreadPool, selector,
-				this.bufferType);
+				messageContext, this.bufferType);
 		return channelBuffer;
 	}
 

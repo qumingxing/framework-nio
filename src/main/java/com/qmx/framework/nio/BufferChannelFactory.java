@@ -70,6 +70,18 @@ public class BufferChannelFactory
 	 * 客户端服务端模式
 	 */
 	private PointModel pointModel;
+	/**
+	 * {@link HandleListener}
+	 */
+	private HandleListener handleListener;
+	/**
+	 * 工作分发线程池{@link WorkTaskThreadPool}
+	 */
+	private ThreadPool workTaskThreadPool;
+	/**
+	 * 主选择器
+	 */
+	private Selector selector;
 
 	private BufferChannelFactory()
 	{
@@ -151,8 +163,7 @@ public class BufferChannelFactory
 	 * @return 返回一个新的或已存在的缓冲区
 	 */
 	public ChannelBuffer getBuffer(SocketChannel socketChannel,
-			MessageContext messageContext, HandleListener handleListener,
-			ThreadPool threadPool, Selector selector,
+			MessageContext messageContext,
 			Class<? extends ChannelBuffer> bufferType)
 	{
 		if (null == socketChannel)
@@ -187,7 +198,7 @@ public class BufferChannelFactory
 			newBuffer.setChannel(socketChannel);
 			newBuffer.setMessageContext(messageContext);
 			newBuffer.setHandleListener(handleListener);
-			newBuffer.setThreadPool(threadPool);
+			newBuffer.setThreadPool(workTaskThreadPool);
 			newBuffer.setSelector(selector);
 			newBuffer.setHeartCheck(heartCheck);
 			newBuffer.setPointModel(pointModel);
@@ -316,6 +327,39 @@ public class BufferChannelFactory
 	public void setPointModel(PointModel pointModel)
 	{
 		this.pointModel = pointModel;
+	}
+
+	/**
+	 * 设置{@link HandleListener}对象
+	 * 
+	 * @param handleListener
+	 *            {@link HandleListener}
+	 */
+	public void setHandleListener(HandleListener handleListener)
+	{
+		this.handleListener = handleListener;
+	}
+
+	/**
+	 * 设置工作分发线程池
+	 * 
+	 * @param workTaskThreadPool
+	 *            {@link WorkTaskThreadPool}
+	 */
+	public void setWorkTaskThreadPool(ThreadPool workTaskThreadPool)
+	{
+		this.workTaskThreadPool = workTaskThreadPool;
+	}
+
+	/**
+	 * 设置主选择器
+	 * 
+	 * @param selector
+	 *            {@link Selector}
+	 */
+	public void setSelector(Selector selector)
+	{
+		this.selector = selector;
 	}
 
 }
