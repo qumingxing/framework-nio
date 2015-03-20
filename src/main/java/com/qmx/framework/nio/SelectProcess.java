@@ -16,6 +16,7 @@ package com.qmx.framework.nio;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -305,6 +306,9 @@ public class SelectProcess
 				key.cancel();
 				DestoryChannel.destory(Channels.getChannel(channel), null);
 			}
+		} catch (ClosedChannelException e)
+		{
+			// 正常关闭不处理
 		} catch (IOException e)
 		{
 			key.cancel();
