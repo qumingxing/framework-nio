@@ -71,6 +71,24 @@ public class Channels extends MessageAdapter
 	}
 
 	/**
+	 * {@link Channels}发送的消息不依赖于特定的通道，而是可以向所有通道或指定的通道发送消息，它已经脱离了
+	 * {@link HandleListener}事件的控制， 所有需要定制{@link MessageContext}对象。
+	 * 
+	 * 使用默认的{@link MessageContext}
+	 * .getDefaultMessageContext()主要对消息格式化、消息编码解码、以及算法的封装
+	 */
+	private Channels()
+	{
+		MessageContext messageContext = MessageContext
+				.getDefaultMessageContext();
+		EncoderAndDecoder encoderAndDecoder = messageContext
+				.getEncoderAndDecoderFactory().getInstance(null);
+		encoderAndDecoder.setAlgorithm(messageContext.getAlgorithm());
+		this.setEncoderAndDecoder(encoderAndDecoder);
+		this.setMessageFormat(messageContext.getMessageFormat());
+	}
+
+	/**
 	 * 获取所有通道的键名称集合，键名称由
 	 * <code>socketChannel.socket().getRemoteSocketAddress()<code>连接端远程地址及端口号构成
 	 * 
@@ -112,6 +130,12 @@ public class Channels extends MessageAdapter
 	public static Channels newChannel(MessageContext messageContext)
 	{
 		Channels newChannel = new Channels(messageContext);
+		return newChannel;
+	}
+
+	public static Channels newChannelWithDefaultContext()
+	{
+		Channels newChannel = new Channels();
 		return newChannel;
 	}
 
