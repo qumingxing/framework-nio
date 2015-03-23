@@ -26,6 +26,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 维护所有通道对象，群发消息单点发消息，定时检查客户端的合法性
  * 
@@ -49,6 +52,7 @@ public class Channels extends MessageAdapter
 	 * 服务端检查心跳状态的定时任务
 	 */
 	private static ScheduledExecutorService SCHEDULED_EXECUTOR_HEART_SERVICE;
+	private final static Logger log = LoggerFactory.getLogger(Channels.class);
 
 	/**
 	 * {@link Channels}发送的消息不依赖于特定的通道，而是可以向所有通道或指定的通道发送消息，它已经脱离了
@@ -321,6 +325,12 @@ public class Channels extends MessageAdapter
 			 * else DestoryChannel.destory(channel.getChannel(), new
 			 * CertificateAuthException("身份认证失败!" + client));
 			 */
+		} else
+		{
+			if (log.isInfoEnabled())
+			{
+				log.info("not found client Channel object->{}", client);
+			}
 		}
 	}
 
