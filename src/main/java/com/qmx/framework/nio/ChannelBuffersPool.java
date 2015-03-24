@@ -54,7 +54,7 @@ public class ChannelBuffersPool
 			for (int i = 0; i < buffersPool.length; i++)
 			{
 				SoftReference<ByteBufferNode> reference = buffersPool[i];
-				if (null != reference)
+				if (null != reference && null != reference.get())
 				{
 					bufferNode = reference.get();
 					if (bufferNode.isRelease())
@@ -105,7 +105,7 @@ public class ChannelBuffersPool
 		for (int i = 0; i < buffersPool.length; i++)
 		{
 			SoftReference<ByteBufferNode> reference = buffersPool[i];
-			if (null != reference)
+			if (null != reference && null != reference.get())
 			{
 				bufferNode = reference.get();
 				if (bufferNode.getByteBuffer() == byteBuffer)
