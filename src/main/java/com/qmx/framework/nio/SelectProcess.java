@@ -171,6 +171,8 @@ public class SelectProcess
 					try
 					{
 						socketChannel.finishConnect();
+						socketChannel.socket().setSendBufferSize(8096);
+						socketChannel.socket().setReceiveBufferSize(8096);
 						String channelName = socketChannel.socket()
 								.getRemoteSocketAddress().toString();
 						channel.setChannel(socketChannel);
