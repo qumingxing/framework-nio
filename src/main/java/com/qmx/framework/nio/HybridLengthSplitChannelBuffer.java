@@ -189,7 +189,7 @@ public class HybridLengthSplitChannelBuffer extends AbstractChannelBuffer
 		for (int i = arraysDataPostion; i < arraysDataAvaliableLength; i++)
 		{
 			byte oneByte = arraysData[i];
-			if (super.isHeartEnable() && super.isServerModel())
+			if (super.isHeartEnable())
 			{
 				int i_index_position = super.heartExecute(oneByte,
 						arraysDataAvaliableLength - arraysDataPostion,

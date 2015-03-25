@@ -264,7 +264,8 @@ public class SelectProcess
 			if (null != config.getPointModel()
 					&& config.getPointModel() == PointModel.CLIENT)
 			{
-				HeartMessageAdapter.getInstance().executeHeart(heartCheck);
+				HeartMessageAdapter.getInstance()
+						.clientExecuteHeart(heartCheck);
 			}
 		}
 	}
@@ -449,12 +450,12 @@ public class SelectProcess
 				bufferChannelFactory.setCertificateInterface(config
 						.getCertificateInterface());
 			}
-			// 服务端心跳检测配置
-			bufferChannelFactory.setHeartCheck(config.getHeartCheck());
 			Channels.checkHeart(config.getHeartCheck());
 		}
 		// 公共配置
 		bufferChannelFactory.setPointModel(config.getPointModel());
+		// 客户端、服务端心跳配置
+		bufferChannelFactory.setHeartCheck(config.getHeartCheck());
 		DestoryChannel.setConfig(this.config);
 	}
 

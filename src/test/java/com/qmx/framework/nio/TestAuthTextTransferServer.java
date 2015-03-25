@@ -45,7 +45,7 @@ public class TestAuthTextTransferServer
 		server.start();
 		int count = 0;
 		Channels channels = Channels.newChannel(null);
-		/*while (true)
+		while (true)
 		{
 			try
 			{
@@ -57,7 +57,7 @@ public class TestAuthTextTransferServer
 			}
 			System.out.println("-------------");
 			channels.broadcast("heheheheheheh" + (count++));
-		}*/
+		}
 
 	}
 }

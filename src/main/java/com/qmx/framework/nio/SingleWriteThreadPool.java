@@ -25,7 +25,7 @@ import java.nio.channels.SocketChannel;
  * @author qmx 2014-12-12 下午3:56:27
  * 
  */
-public class SingleWriteThreadPool implements ThreadPool
+public class SingleWriteThreadPool extends Writer implements ThreadPool
 {
 	/**
 	 * 发送缓冲区大小，可以重复使用的
@@ -73,10 +73,7 @@ public class SingleWriteThreadPool implements ThreadPool
 		{
 			if (socketChannel.isOpen())
 			{
-				while (byteBuffer.hasRemaining())
-				{
-					socketChannel.write(byteBuffer);
-				}
+				write0(writeWorker.getChannel(), byteBuffer);
 			}
 		} catch (IOException e)
 		{

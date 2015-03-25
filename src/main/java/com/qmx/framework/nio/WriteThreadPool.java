@@ -20,16 +20,13 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * 多线程发送
  * 
  * @author qmx 2014-11-28 下午3:49:08
  * 
  */
-public class WriteThreadPool implements ThreadPool
+public class WriteThreadPool extends Writer implements ThreadPool
 {
 	/**
 	 * 写线程池
@@ -47,8 +44,6 @@ public class WriteThreadPool implements ThreadPool
 	 * 线程池大小
 	 */
 	private int size;
-	private static final Logger log = LoggerFactory
-			.getLogger(WriteThreadPool.class);
 
 	private WriteThreadPool()
 	{
@@ -102,18 +97,7 @@ public class WriteThreadPool implements ThreadPool
 				{
 					if (socketChannel.isOpen())
 					{
-						while (byteBuffer.hasRemaining())
-						{
-							int len = socketChannel.write(byteBuffer);
-							if (len == 0)
-							{
-								if (log.isInfoEnabled())
-								{
-									log.info("未知网络问题导致的数据写入失败->{}", writeWorker
-											.getChannel().getChannelName());
-								}
-							}
-						}
+						write0(writeWorker.getChannel(), byteBuffer);
 					}
 				} catch (IOException e)
 				{

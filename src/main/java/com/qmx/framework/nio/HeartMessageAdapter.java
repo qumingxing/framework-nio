@@ -34,8 +34,7 @@ public class HeartMessageAdapter
 	/**
 	 * 定时任务对象
 	 */
-	private static final ScheduledExecutorService SCHEDULED_THREAD_POOL_EXECUTOR = Executors
-			.newScheduledThreadPool(1);
+	private static ScheduledExecutorService SCHEDULED_THREAD_POOL_EXECUTOR;
 	/**
 	 * 客户端通道对象
 	 */
@@ -66,15 +65,20 @@ public class HeartMessageAdapter
 	}
 
 	/**
-	 * 执行心跳发送<br/>
+	 * 执行客户端心跳发送<br/>
 	 * 客户端重连后会导致多次调用该方法所以通过started状态标识，判断当前通道是否与之前的通道是一个引用，如果是直接结束方法执行，
 	 * 否则重新设置新的通道对象
 	 * 
 	 * @param heartCheck
 	 *            {@link HeartCheck}
 	 */
-	protected void executeHeart(final HeartCheck heartCheck)
+	protected void clientExecuteHeart(final HeartCheck heartCheck)
 	{
+		if (null == SCHEDULED_THREAD_POOL_EXECUTOR)
+		{
+			SCHEDULED_THREAD_POOL_EXECUTOR = Executors
+					.newScheduledThreadPool(1);
+		}
 		if (started)
 		{
 			Channel newChannel = CHANNELS.getFirstChannel();
@@ -101,5 +105,19 @@ public class HeartMessageAdapter
 			}
 		}, heartCheck.getDelayTime(), heartCheck.getDelayTime(),
 				TimeUnit.MILLISECONDS);
+	}
+
+	/**
+	 * 服务端收到客户端的心跳信息后响应客户端
+	 * 
+	 * @param channelName
+	 *            通道名称
+	 * @param heartCheck
+	 *            心跳资源
+	 */
+	protected void serverResponseClientHeart(String channelName,
+			HeartCheck heartCheck)
+	{
+		CHANNELS.broadcastSingle(channelName, heartCheck.getHeartMessage());
 	}
 }

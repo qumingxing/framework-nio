@@ -61,7 +61,12 @@ public abstract class AbstractHeartChannelBuffer
 				{
 					log.info("检测到心跳->{}", channelName);
 				}
-				flushAcceptTime(channelName);
+				if (isServerModel())
+				{
+					flushAcceptTime(channelName);
+					HeartMessageAdapter.getInstance()
+							.serverResponseClientHeart(channelName, heartCheck);
+				}
 				return 3;
 			} else
 				return 0;
@@ -87,6 +92,18 @@ public abstract class AbstractHeartChannelBuffer
 	protected boolean isServerModel()
 	{
 		if (null != pointModel && pointModel == PointModel.SERVER)
+			return true;
+		return false;
+	}
+
+	/**
+	 * 判断当前是否是客户端模式
+	 * 
+	 * @return true 客户端模式
+	 */
+	protected boolean isClientModel()
+	{
+		if (null != pointModel && pointModel == PointModel.CLIENT)
 			return true;
 		return false;
 	}
