@@ -4,10 +4,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.qmx.framework.nio.HandleListener;
 import com.qmx.framework.nio.MessageEvent;
 import com.qmx.framework.nio.StringPrintWriter;
@@ -69,9 +67,9 @@ public class TestServerFileDefaultHandleListener implements HandleListener
 		System.out.println("accept");
 		InputStream inputStream = null;
 		try
-		{// /usr/woniu/olts/resources/123.txt
+		{
 			inputStream = new FileInputStream(
-					"/usr/woniu/olts/resources/123.txt");// d:\\sst-client-20141107182427.zip
+					"d:/terminal_lib.zip");
 			byte[] aa = new byte[8096];
 			int temp = 0;
 			while ((temp = inputStream.read(aa)) != -1)
@@ -96,5 +94,6 @@ public class TestServerFileDefaultHandleListener implements HandleListener
 			}
 		}
 		System.out.println("写完 ");
+		event.write(new byte[]{'\n'});
 	}
 }

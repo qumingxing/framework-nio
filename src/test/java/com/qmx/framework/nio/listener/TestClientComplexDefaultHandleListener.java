@@ -2,13 +2,8 @@ package com.qmx.framework.nio.listener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.qmx.framework.nio.HandleListener;
 import com.qmx.framework.nio.MessageEvent;
 import com.qmx.framework.nio.MessageFormatEnhanceStringToString;
@@ -28,8 +23,6 @@ public class TestClientComplexDefaultHandleListener implements HandleListener
 	private List<String> testData = new ArrayList<String>();
 	private final Logger log = LoggerFactory
 			.getLogger(TestClientComplexDefaultHandleListener.class);
-	private final ScheduledExecutorService scheduledExecutorService = Executors
-			.newSingleThreadScheduledExecutor();
 
 	public TestClientComplexDefaultHandleListener()
 	{

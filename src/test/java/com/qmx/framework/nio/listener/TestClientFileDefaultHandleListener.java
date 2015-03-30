@@ -25,22 +25,13 @@ public class TestClientFileDefaultHandleListener implements HandleListener
 	private OutputStream outputStream;
 	private final Logger log = LoggerFactory
 			.getLogger(TestClientFileDefaultHandleListener.class);
+
 	public TestClientFileDefaultHandleListener()
 	{
 		for (int i = 0; i < 100; i++)
 		{
 			testData.add("client" + i);
 		}
-		try
-		{
-			outputStream = new FileOutputStream(
-					"e:\\sst-client-20141107182427.zip", true);// sst-client-20141107182427.zip
-		} catch (FileNotFoundException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		;
 	}
 
 	@Override
@@ -62,15 +53,37 @@ public class TestClientFileDefaultHandleListener implements HandleListener
 		System.out.println("close");
 	}
 
-	static int aaa = 0;
-
 	@Override
 	public void read(MessageEvent event)
 	{
 		// TODO Auto-generated method stub
 		byte[] byt = (byte[]) event.getMessage();
-		aaa += byt.length;
-		System.out.println("累计读" + aaa);
+		if (null == outputStream)
+		{
+			try
+			{
+				outputStream = new FileOutputStream(
+						"e:\\sst-client-20141107182427.zip", true);// sst-client-20141107182427.zip
+			} catch (FileNotFoundException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (byt.length == 1 && byt[0] == '\n')
+		{
+			System.out.println("read over");
+			try
+			{
+				outputStream.flush();
+				outputStream.close();
+			} catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
 
 		try
 		{
@@ -80,18 +93,6 @@ public class TestClientFileDefaultHandleListener implements HandleListener
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-		try
-		{
-			outputStream.flush();
-			/*
-			 * if(aaa ==37339411) { outputStream.close(); }
-			 */
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 	@Override

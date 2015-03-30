@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author qmx 2014-12-1 上午10:38:41
  * 
  */
-public class Channels extends MessageAdapter
+public final class Channels extends MessageAdapter
 {
 	/**
 	 * 维护所有{@link Channel} 通道的<code>Map</code>集合 该集合的键由
@@ -152,7 +152,7 @@ public class Channels extends MessageAdapter
 	 * @param channel
 	 *            新的{@link Channel}对象
 	 */
-	public static void addChannel(String alias, Channel channel)
+	protected static void addChannel(String alias, Channel channel)
 	{
 		channels.put(alias, channel);
 	}
@@ -163,7 +163,7 @@ public class Channels extends MessageAdapter
 	 * @param socketChannel
 	 *            通道对象
 	 */
-	public static void removeChannel(SocketChannel socketChannel)
+	protected static void removeChannel(SocketChannel socketChannel)
 	{
 		String clientSign = socketChannel.socket().getRemoteSocketAddress()
 				.toString();
@@ -177,7 +177,7 @@ public class Channels extends MessageAdapter
 	 *            通道对象的
 	 *            <code>socketChannel.socket().getRemoteSocketAddress()<code>
 	 */
-	public static void removeChannel(String channelName)
+	protected static void removeChannel(String channelName)
 	{
 		channels.remove(channelName);
 	}
@@ -190,7 +190,7 @@ public class Channels extends MessageAdapter
 	 * @param authResult
 	 *            <code>true</code>认证通过
 	 */
-	public static void channelAuthResult(SocketChannel socketChannel,
+	protected static void channelAuthResult(SocketChannel socketChannel,
 			boolean authResult)
 	{
 		String clientSign = socketChannel.socket().getRemoteSocketAddress()
@@ -459,7 +459,7 @@ public class Channels extends MessageAdapter
 	 *            底层通道
 	 * @return {@link Channel}通道对象
 	 */
-	public static Channel getChannel(SocketChannel socketChannel)
+	protected static Channel getChannel(SocketChannel socketChannel)
 	{
 		if (socketChannel.isConnected())
 		{
