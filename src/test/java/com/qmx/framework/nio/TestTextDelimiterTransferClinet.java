@@ -22,7 +22,7 @@ public class TestTextDelimiterTransferClinet
 		Client client = new Client(config.getIp(), config.getPort());
 		SelectorStrategy selectorStrategy = new SingleSelectorStrategy(2, 2);
 		selectorStrategy.setHandleListen(new TestClientDelimiterDefaultHandleListener());
-		selectorStrategy.setBufferType(LimitChannelBuffer.class);
+		selectorStrategy.setBufferType(DelimiterLimitChannelBuffer.class);
 		selectorStrategy.setConfig(config);
 		selectorStrategy.getMessageContext().setMessageFormat(DELIMITER_STRING_TO_STRING);
 		client.setSelectorStrategy(selectorStrategy);

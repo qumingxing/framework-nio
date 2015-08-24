@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author qmx 2014-12-10 上午11:45:36
  * 
  */
-public class LimitChannelBuffer extends AbstractChannelBuffer implements
+public class DelimiterLimitChannelBuffer extends AbstractChannelBuffer implements
 		ChannelBuffer
 {
 	/**
@@ -66,12 +66,12 @@ public class LimitChannelBuffer extends AbstractChannelBuffer implements
 		this.threadPool = threadPool;
 	}
 
-	public LimitChannelBuffer(int size)
+	public DelimiterLimitChannelBuffer(int size)
 	{
 		arraysData = new byte[size];
 	}
 
-	public LimitChannelBuffer()
+	public DelimiterLimitChannelBuffer()
 	{
 		this(defaultArraysLength);
 	}
@@ -217,7 +217,7 @@ public class LimitChannelBuffer extends AbstractChannelBuffer implements
 	public static void main(String[] args) throws UnsupportedEncodingException, InterruptedException
 	{
 		//System.out.print(aa);
-		LimitChannelBuffer limitChannelBuffer = new LimitChannelBuffer();
+		DelimiterLimitChannelBuffer limitChannelBuffer = new DelimiterLimitChannelBuffer();
 		String aaab = "123\r4\r5\r6789\rabc";
 		ByteBuffer buffer = ByteBuffer.allocate(aaab.getBytes().length);
 		buffer.put(aaab.getBytes());

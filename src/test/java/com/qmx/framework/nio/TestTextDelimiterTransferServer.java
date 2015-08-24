@@ -18,7 +18,7 @@ public class TestTextDelimiterTransferServer
 		Server server = new Server(config.getPort());
 		SelectorStrategy selectorStrategy = new SingleSelectorStrategy(10, 2);
 		selectorStrategy.setHandleListen(new TestServerDelimiterDefaultHandleListener());
-		selectorStrategy.setBufferType(LimitChannelBuffer.class);
+		selectorStrategy.setBufferType(DelimiterLimitChannelBuffer.class);
 		selectorStrategy.setConfig(config);
 		selectorStrategy.getMessageContext().setMessageFormat(DELIMITER_STRING_TO_STRING);
 		server.setSelectorStrategy(selectorStrategy);
