@@ -188,6 +188,9 @@ public class BufferChannelFactory
 			} else if (bufferType == ComplexSplitChannelBuffer.class)
 			{
 				newBuffer = new ComplexSplitChannelBuffer();
+			} else if (bufferType == LimitChannelBuffer.class)
+			{
+				newBuffer = new LimitChannelBuffer();
 			} else
 			{
 				newBuffer = new DefaultChannelBuffer();

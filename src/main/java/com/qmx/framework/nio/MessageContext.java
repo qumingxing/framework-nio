@@ -31,6 +31,7 @@ public class MessageContext
 	 *  {@link MessageFormatHybridBytesToBytes}
 	 *  {@link MessageFormatHybridStringToString}
 	 *  {@link MessageFormatStringToString}
+	 *  {@link MessageFormatDelimiterStringToString}}
 	 * </pre>
 	 */
 	private MessageFormat messageFormat;
